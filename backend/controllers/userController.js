@@ -1,5 +1,6 @@
 let user = require("../models/User");
 let bcrypt = require("bcrypt");
+let jwt = require("jsonwebtoken");
 
 let registerUser = async (req, res) => {
   try {
@@ -34,26 +35,35 @@ let registerUser = async (req, res) => {
 let loginUser = async (req, res) => {
   try {
     let data = req.body;
+
     let validEmail = await user.findOne({
       email: data.email,
     });
+
     if (!validEmail) {
       return res.status(400).json({
         status: 0,
-        message: "Please Enter a valid email adress",
+        message: "Please Enter a valid email address",
       });
     }
+
     let passMatch = await bcrypt.compare(data.password, validEmail.password);
+
     if (!passMatch) {
       return res.status(400).json({
         status: 0,
         message: "Please Enter a valid password",
       });
     }
+
+    let token = jwt.sign({ id: validEmail._id }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
     res.status(200).json({
       status: 1,
       message: "Successfully Logged in",
-      data,
+      token,
     });
   } catch (error) {
     res.status(500).json({
