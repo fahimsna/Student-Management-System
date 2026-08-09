@@ -4,7 +4,7 @@ let bcrypt = require("bcrypt");
 let registerUser = async (req, res) => {
   try {
     let data = req.body;
-    
+
     let existEmail = await user.findOne({
       email: data.email,
     });
@@ -31,5 +31,37 @@ let registerUser = async (req, res) => {
     });
   }
 };
+let loginUser = async (req, res) => {
+  try {
+    let data = req.body;
+    let validEmail = await user.findOne({
+      email: data.email,
+    });
+    if (!validEmail) {
+      return res.status(400).json({
+        status: 0,
+        message: "Please Enter a valid email adress",
+      });
+    }
+    let passMatch = await bcrypt.compare(data.password, validEmail.password);
+    if (!passMatch) {
+      return res.status(400).json({
+        status: 0,
+        message: "Please Enter a valid password",
+      });
+    }
+    res.status(200).json({
+      status: 1,
+      message: "Successfully Logged in",
+      data,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: "Failed to login",
+      error,
+    });
+  }
+};
 
-module.exports = registerUser;
+module.exports = { registerUser, loginUser };
