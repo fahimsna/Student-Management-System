@@ -1,4 +1,5 @@
 const student = require("../models/Student");
+const user = require("../models/User");
 
 let createStudent = async (req, res) => {
   try {
@@ -65,5 +66,33 @@ let getSingleStudent = async (req, res) => {
     });
   }
 };
+let updateStudent = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let data = req.body;
 
-module.exports = { createStudent, getStudent, getSingleStudent };
+    let result = await student.findOneAndUpdate({ _id: id }, data, {
+      new: true,
+    });
+
+    if (!result) {
+      return res.status(404).json({
+        status: 0,
+        message: "Couldn't find any student",
+      });
+    }
+
+    res.status(200).json({
+      status: 1,
+      message: "Updated Successfully",
+      result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: "Failed to Update Student",
+    });
+  }
+};
+
+module.exports = { createStudent, getStudent, getSingleStudent, updateStudent };
