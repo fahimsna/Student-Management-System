@@ -17,6 +17,7 @@ export default function Login() {
 
       let result = await loginUser(data);
       localStorage.setItem("token", result.data.token);
+      navigate("/dashboard");
       setMessage(result.data.message);
     } catch (error) {
       console.log(error);
