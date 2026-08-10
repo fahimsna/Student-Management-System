@@ -1,11 +1,29 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import { Users, UserCheck, UserPlus, UserX } from "lucide-react";
+import { getStudent } from "../api/studentApi";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [students, setStudents] = useState([]);
+
+  useEffect(() => {
+    let fetchStudents = async () => {
+      try {
+        let result = await getStudent();
+
+        console.log(result);
+
+        setStudents(result.data.students);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
@@ -42,7 +60,7 @@ export default function Dashboard() {
                       <p className="text-sm text-[#6C757D]">Total Students</p>
 
                       <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                        120
+                        {students.length}
                       </h2>
                     </div>
 
