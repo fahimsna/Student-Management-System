@@ -24,6 +24,7 @@ let createStudent = async (req, res) => {
     res.status(500).json({
       status: 0,
       message: "Failed to Add Student",
+      error,
     });
   }
 };
@@ -63,6 +64,7 @@ let getSingleStudent = async (req, res) => {
     res.status(500).json({
       status: 0,
       message: "Failed to find Student",
+      error,
     });
   }
 };
@@ -91,8 +93,38 @@ let updateStudent = async (req, res) => {
     res.status(500).json({
       status: 0,
       message: "Failed to Update Student",
+      error,
+    });
+  }
+};
+let deleteStudent = async (req, res) => {
+  try {
+    let id = req.params.id;
+    let result = await student.findByIdAndDelete(id);
+    if (!result) {
+      return res.status(404).json({
+        status: 0,
+        message: "Couldn't find Student",
+      });
+    }
+    res.status(200).json({
+      status: 1,
+      message: "Student deleted",
+      id,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: "Failed to Delete Student",
+      error,
     });
   }
 };
 
-module.exports = { createStudent, getStudent, getSingleStudent, updateStudent };
+module.exports = {
+  createStudent,
+  getStudent,
+  getSingleStudent,
+  updateStudent,
+  deleteStudent,
+};
