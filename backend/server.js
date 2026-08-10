@@ -1,11 +1,14 @@
 let express = require("express");
 let mongoose = require("mongoose");
 let userRoutes = require("./routes/userRoutes");
+let studentRoutes = require("./routes/studentRoutes");
+
 require("dotenv").config();
 
 let app = express();
 app.use(express.json());
 app.use("/api", userRoutes);
+app.use("/api", studentRoutes);
 mongoose
   .connect(process.env.DBURL)
   .then(() => {
