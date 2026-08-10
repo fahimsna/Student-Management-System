@@ -2,55 +2,87 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import Logout from "../pages/Logout";
 
-export default function Sidebar() {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   return (
-    <aside className="w-64 min-h-[calc(100vh-4rem)] bg-[#495057] text-white flex flex-col justify-between shadow-md">
-      {/* Navigation */}
-      <div className="p-4 space-y-2">
-        <NavLink
-          to="/dashboard"
-          className={({ isActive }) =>
-            `block px-4 py-3 rounded-md transition duration-200 ${
-              isActive
-                ? "bg-[#495057] text-white"
-                : "text-[#CED4DA] hover:bg-[#495057] hover:text-white"
-            }`
-          }
-        >
-          Dashboard
-        </NavLink>
+    <>
+      {/* Mobile Overlay */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          className="fixed inset-0 bg-black/40 z-40 md:hidden"
+        ></div>
+      )}
 
-        <NavLink
-          to="/students"
-          className={({ isActive }) =>
-            `block px-4 py-3 rounded-md transition duration-200 ${
-              isActive
-                ? "bg-[#495057] text-white"
-                : "text-[#CED4DA] hover:bg-[#495057] hover:text-white"
-            }`
+      <aside
+        className={`
+          fixed md:static
+          top-16 md:top-0
+          left-0
+          z-50
+          w-64
+          h-[calc(100vh-4rem)]
+          md:h-auto
+          md:min-h-full
+          bg-[#495057]
+          text-white
+          flex flex-col justify-between
+          shadow-md
+          transform transition-transform duration-300
+          ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
           }
-        >
-          Students
-        </NavLink>
+        `}
+      >
+        {/* Navigation */}
+        <div className="p-4 space-y-2">
+          <NavLink
+            to="/dashboard"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `block px-4 py-3 rounded-md transition duration-200 ${
+                isActive
+                  ? "bg-[#343A40] text-white"
+                  : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
+              }`
+            }
+          >
+            Dashboard
+          </NavLink>
 
-        <NavLink
-          to="/profile"
-          className={({ isActive }) =>
-            `block px-4 py-3 rounded-md transition duration-200 ${
-              isActive
-                ? "bg-[#495057] text-white"
-                : "text-[#CED4DA] hover:bg-[#495057] hover:text-white"
-            }`
-          }
-        >
-          Profile
-        </NavLink>
-      </div>
+          <NavLink
+            to="/students"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `block px-4 py-3 rounded-md transition duration-200 ${
+                isActive
+                  ? "bg-[#343A40] text-white"
+                  : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
+              }`
+            }
+          >
+            Students
+          </NavLink>
 
-      {/* Logout */}
-      <div className="p-4 border-t border-[#495057]">
-        <Logout />
-      </div>
-    </aside>
+          <NavLink
+            to="/profile"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `block px-4 py-3 rounded-md transition duration-200 ${
+                isActive
+                  ? "bg-[#343A40] text-white"
+                  : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
+              }`
+            }
+          >
+            Profile
+          </NavLink>
+        </div>
+
+        {/* Logout */}
+        <div className="p-4 border-t border-[#6C757D]">
+          <Logout />
+        </div>
+      </aside>
+    </>
   );
 }
