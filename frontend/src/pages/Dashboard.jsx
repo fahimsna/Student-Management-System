@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
+import { Users, UserCheck, UserPlus, UserX } from "lucide-react";
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -35,38 +36,78 @@ export default function Dashboard() {
               {/* Statistics Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
                 {/* Total Students */}
-                <div className="bg-white border border-[#DEE2E6] rounded-lg p-5 shadow-sm">
-                  <p className="text-sm text-[#6C757D]">Total Students</p>
+                <div className="bg-white border border-[#DEE2E6] rounded-xl p-5 shadow-sm hover:shadow-md transition duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-[#6C757D]">Total Students</p>
 
-                  <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                    120
-                  </h2>
+                      <h2 className="text-3xl font-bold text-[#212529] mt-2">
+                        120
+                      </h2>
+                    </div>
+
+                    <div className="w-11 h-11 rounded-lg bg-[#E9ECEF] flex items-center justify-center">
+                      <Users size={22} className="text-[#343A40]" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Active Students */}
-                <div className="bg-white border border-[#DEE2E6] rounded-lg p-5 shadow-sm">
-                  <p className="text-sm text-[#6C757D]">Active Students</p>
+                <div className="bg-white border border-[#DEE2E6] rounded-xl p-5 shadow-sm hover:shadow-md transition duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-[#6C757D]">Active Students</p>
 
-                  <h2 className="text-3xl font-bold text-[#212529] mt-2">98</h2>
+                      <h2 className="text-3xl font-bold text-[#212529] mt-2">
+                        98
+                      </h2>
+                    </div>
+
+                    <div className="w-11 h-11 rounded-lg bg-[#E9ECEF] flex items-center justify-center">
+                      <UserCheck size={22} className="text-[#343A40]" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* New Students */}
-                <div className="bg-white border border-[#DEE2E6] rounded-lg p-5 shadow-sm">
-                  <p className="text-sm text-[#6C757D]">New Students</p>
+                <div className="bg-white border border-[#DEE2E6] rounded-xl p-5 shadow-sm hover:shadow-md transition duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-[#6C757D]">New Students</p>
 
-                  <h2 className="text-3xl font-bold text-[#212529] mt-2">12</h2>
+                      <h2 className="text-3xl font-bold text-[#212529] mt-2">
+                        12
+                      </h2>
+                    </div>
+
+                    <div className="w-11 h-11 rounded-lg bg-[#E9ECEF] flex items-center justify-center">
+                      <UserPlus size={22} className="text-[#343A40]" />
+                    </div>
+                  </div>
                 </div>
 
                 {/* Inactive Students */}
-                <div className="bg-white border border-[#DEE2E6] rounded-lg p-5 shadow-sm">
-                  <p className="text-sm text-[#6C757D]">Inactive Students</p>
+                <div className="bg-white border border-[#DEE2E6] rounded-xl p-5 shadow-sm hover:shadow-md transition duration-200">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm text-[#6C757D]">
+                        Inactive Students
+                      </p>
 
-                  <h2 className="text-3xl font-bold text-[#212529] mt-2">22</h2>
+                      <h2 className="text-3xl font-bold text-[#212529] mt-2">
+                        22
+                      </h2>
+                    </div>
+
+                    <div className="w-11 h-11 rounded-lg bg-[#E9ECEF] flex items-center justify-center">
+                      <UserX size={22} className="text-[#343A40]" />
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Recent Activity */}
-              <div className="mt-8 bg-white border border-[#DEE2E6] rounded-lg shadow-sm p-5">
+              <div className="mt-8 bg-white border border-[#DEE2E6] rounded-xl shadow-sm p-5">
                 <h2 className="text-lg font-semibold text-[#212529]">
                   Recent Activity
                 </h2>
