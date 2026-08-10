@@ -42,5 +42,28 @@ let getStudent = async (req, res) => {
     });
   }
 };
+let getSingleStudent = async (req, res) => {
+  try {
+    let data = req.params.id;
+    let result = await student.findById(data);
+    if (!result) {
+      return res.status(404).json({
+        status: 0,
+        message: "Couldn't find any student",
+      });
+    }
 
-module.exports = { createStudent, getStudent };
+    res.status(200).json({
+      status: 1,
+      message: "Fetched the particular Student",
+      result,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: "Failed to find Student",
+    });
+  }
+};
+
+module.exports = { createStudent, getStudent, getSingleStudent };
