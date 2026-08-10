@@ -1,14 +1,19 @@
 import React, { useState } from "react";
+import { registerUser } from "../api/authApi";
 
 export default function Register() {
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
 
-  let handleRegister = () => {
-    console.log(name);
-    console.log(email);
-    console.log(password);
+  let handleRegister = async () => {
+    let data = {
+      name,
+      email,
+      password,
+    };
+    let result = await registerUser(data);
+    console.log(result);
   };
 
   return (

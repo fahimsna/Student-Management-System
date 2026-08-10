@@ -2,11 +2,13 @@ let express = require("express");
 let mongoose = require("mongoose");
 let userRoutes = require("./routes/userRoutes");
 let studentRoutes = require("./routes/studentRoutes");
+let cors = require("cors");
 
 require("dotenv").config();
 
 let app = express();
 app.use(express.json());
+app.use(cors());
 app.use("/api", userRoutes);
 app.use("/api/students", studentRoutes);
 mongoose
