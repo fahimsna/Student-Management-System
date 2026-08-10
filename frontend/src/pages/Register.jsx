@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { registerUser } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Register() {
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   let [message, setMessage] = useState("");
+  let navigate = useNavigate();
 
   let handleRegister = async () => {
     try {
@@ -14,6 +16,7 @@ export default function Register() {
         email,
         password,
       };
+
       let result = await registerUser(data);
       setMessage(result.data.message);
     } catch (error) {
@@ -65,6 +68,17 @@ export default function Register() {
               {message}
             </p>
           )}
+        </div>
+
+        <div className="py-4 flex justify-center gap-2 text-sm">
+          <p className="text-[#6C757D]">Already have an account?</p>
+
+          <button
+            onClick={() => navigate("/login")}
+            className="text-[#343A40] font-semibold cursor-pointer hover:underline"
+          >
+            Login
+          </button>
         </div>
       </div>
     </div>

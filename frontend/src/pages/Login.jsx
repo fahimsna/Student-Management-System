@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { loginUser } from "../api/authApi";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
   let [message, setMessage] = useState("");
+  let navigate = useNavigate();
 
   let handleLogin = async () => {
     try {
@@ -14,8 +16,7 @@ export default function Login() {
       };
 
       let result = await loginUser(data);
-
-      console.log(result);
+      localStorage.setItem("token", result.data.token);
       setMessage(result.data.message);
     } catch (error) {
       console.log(error);
@@ -58,7 +59,10 @@ export default function Login() {
         <div className="py-4 flex justify-center gap-2 text-sm">
           <p className="text-[#6C757D]">Don't have an account?</p>
 
-          <button className="text-[#343A40] font-semibold cursor-pointer hover:underline">
+          <button
+            onClick={() => navigate("/register")}
+            className="text-[#343A40] font-semibold cursor-pointer hover:underline"
+          >
             Register
           </button>
         </div>
