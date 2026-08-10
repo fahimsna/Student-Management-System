@@ -27,4 +27,20 @@ let createStudent = async (req, res) => {
   }
 };
 
-module.exports = createStudent;
+let getStudent = async (req, res) => {
+  try {
+    let students = await student.find();
+    res.status(200).json({
+      status: 1,
+      message: "Successfully fetched all Students",
+      students,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 0,
+      message: "Failed to find Student",
+    });
+  }
+};
+
+module.exports = { createStudent, getStudent };

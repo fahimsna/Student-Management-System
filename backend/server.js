@@ -8,7 +8,7 @@ require("dotenv").config();
 let app = express();
 app.use(express.json());
 app.use("/api", userRoutes);
-app.use("/api", studentRoutes);
+app.use("/api/students", studentRoutes);
 mongoose
   .connect(process.env.DBURL)
   .then(() => {
