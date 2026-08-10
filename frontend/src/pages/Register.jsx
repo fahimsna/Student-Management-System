@@ -5,15 +5,20 @@ export default function Register() {
   let [name, setName] = useState("");
   let [email, setEmail] = useState("");
   let [password, setPassword] = useState("");
+  let [message, setMessage] = useState("");
 
   let handleRegister = async () => {
-    let data = {
-      name,
-      email,
-      password,
-    };
-    let result = await registerUser(data);
-    console.log(result);
+    try {
+      let data = {
+        name,
+        email,
+        password,
+      };
+      let result = await registerUser(data);
+      setMessage(result.data.message);
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Registration Failed");
+    }
   };
 
   return (
@@ -42,6 +47,7 @@ export default function Register() {
       />
 
       <button onClick={handleRegister}>Register</button>
+      <p>{message}</p>
     </div>
   );
 }
