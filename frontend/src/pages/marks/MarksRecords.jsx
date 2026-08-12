@@ -158,7 +158,7 @@ export default function MarksRecords() {
                 {/* TABLE */}
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[950px]">
+                  <table className="w-full min-w-237.5">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/70">
                         <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">

@@ -125,7 +125,7 @@ export default function StudentDetails() {
 
                     <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
                       {/* Avatar */}
-                      <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center rounded-2xl bg-white shadow-lg">
+                      <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-white shadow-lg">
                         <span className="text-2xl font-bold text-slate-900">
                           {student.name
                             ? student.name.charAt(0).toUpperCase()
@@ -274,7 +274,7 @@ export default function StudentDetails() {
 
                     {/* Account Summary */}
                     <div className="mt-6 flex items-center gap-3 rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
-                      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-blue-600 shadow-sm">
                         <User size={18} />
                       </div>
 

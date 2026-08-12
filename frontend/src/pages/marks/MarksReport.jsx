@@ -455,7 +455,7 @@ export default function MarksReport() {
           NAVBAR
       ================================================= */}
 
-      <div className="fixed left-0 right-0 top-0 z-[100] h-16 print:hidden">
+      <div className="fixed left-0 right-0 top-0 z-100 h-16 print:hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
@@ -463,7 +463,7 @@ export default function MarksReport() {
           DESKTOP SIDEBAR
       ================================================= */}
 
-      <aside className="fixed bottom-0 left-0 top-16 z-[90] hidden w-64 overflow-y-auto overflow-x-hidden bg-white lg:block print:hidden">
+      <aside className="fixed bottom-0 left-0 top-16 z-90 hidden w-64 overflow-y-auto overflow-x-hidden bg-white lg:block print:hidden">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </aside>
 
@@ -473,7 +473,7 @@ export default function MarksReport() {
 
       {sidebarOpen && (
         <div
-          className="fixed inset-0 z-[80] bg-slate-900/40 lg:hidden print:hidden"
+          className="fixed inset-0 z-80 bg-slate-900/40 lg:hidden print:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -488,7 +488,7 @@ export default function MarksReport() {
           bottom-0
           left-0
           top-16
-          z-[90]
+          z-90
           w-72
           overflow-y-auto
           overflow-x-hidden
@@ -694,7 +694,7 @@ export default function MarksReport() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1200px]">
+                  <table className="w-full min-w-300">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/70">
                         <TableHead>#</TableHead>
@@ -863,7 +863,7 @@ export default function MarksReport() {
       ===================================================== */}
 
       {editingRecord && (
-        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/60 p-4">
+        <div className="fixed inset-0 z-200 flex items-center justify-center bg-slate-950/60 p-4">
           <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
             {/* HEADER */}
 
@@ -1034,7 +1034,7 @@ export default function MarksReport() {
       ===================================================== */}
 
       {deletingId && (
-        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-slate-950/60 p-4">
+        <div className="fixed inset-0 z-210 flex items-center justify-center bg-slate-950/60 p-4">
           <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
             <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-xl">
               🗑️

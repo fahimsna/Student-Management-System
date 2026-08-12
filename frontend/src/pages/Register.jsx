@@ -64,9 +64,9 @@ export default function Register() {
         ====================================================== */}
         <section className="relative hidden overflow-hidden bg-[#eef3f8] lg:flex">
           {/* Soft decorative shapes */}
-          <div className="absolute -left-40 -top-40 h-[460px] w-[460px] rounded-full bg-white/70 blur-3xl" />
+          <div className="absolute -left-40 -top-40 h-115 w-115 rounded-full bg-white/70 blur-3xl" />
 
-          <div className="absolute -bottom-40 -right-20 h-[400px] w-[400px] rounded-full bg-blue-100/40 blur-3xl" />
+          <div className="absolute -bottom-40 -right-20 h-100 w-100 rounded-full bg-blue-100/40 blur-3xl" />
 
           <div className="relative z-10 flex w-full flex-col px-12 py-10 xl:px-16">
             {/* Brand */}
@@ -110,7 +110,7 @@ export default function Register() {
                 </p>
 
                 {/* Benefits */}
-                <div className="mt-9 max-w-[470px] space-y-3">
+                <div className="mt-9 max-w-117.5 space-y-3">
                   <div className="flex items-center gap-4 rounded-2xl border border-white bg-white/80 p-4 shadow-[0_10px_35px_rgba(15,23,42,0.04)]">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                       <Users size={19} />
@@ -187,7 +187,7 @@ export default function Register() {
           </div>
 
           {/* Soft transition */}
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-gradient-to-l from-[#f8fafc] to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-24 bg-linear-to-l from-[#f8fafc] to-transparent" />
         </section>
 
         {/* =====================================================

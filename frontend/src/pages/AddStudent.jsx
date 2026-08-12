@@ -199,7 +199,7 @@ export default function AddStudent() {
                   ================================================== */}
                   {error && (
                     <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
-                      <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+                      <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
 
                       <p className="text-sm font-medium text-red-700">
                         {error}
@@ -211,7 +211,7 @@ export default function AddStudent() {
                     <div className="mb-5 flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3.5">
                       <CheckCircle2
                         size={17}
-                        className="flex-shrink-0 text-emerald-600"
+                        className="shrink-0 text-emerald-600"
                       />
 
                       <p className="text-sm font-medium text-emerald-700">

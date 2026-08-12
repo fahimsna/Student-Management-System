@@ -547,7 +547,7 @@ export default function Dashboard() {
                         {/* Student information */}
                         <div className="flex min-w-0 items-center gap-4">
                           {/* Avatar */}
-                          <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 transition group-hover:bg-blue-50 group-hover:text-blue-600">
+                          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 transition group-hover:bg-blue-50 group-hover:text-blue-600">
                             {student.name
                               ? student.name.charAt(0).toUpperCase()
                               : "S"}
@@ -572,7 +572,7 @@ export default function Dashboard() {
                         </div>
 
                         {/* Right information */}
-                        <div className="flex items-center gap-4 pl-[60px] sm:pl-0">
+                        <div className="flex items-center gap-4 pl-15 sm:pl-0">
                           <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
                             <CalendarDays size={14} />
 

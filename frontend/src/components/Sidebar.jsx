@@ -70,7 +70,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       <aside
         className={`
           fixed left-0 top-16 z-50
-          flex h-[calc(100vh-4rem)] w-[260px]
+          flex h-[calc(100vh-4rem)] w-65
           flex-col
           border-r border-slate-200
           bg-white

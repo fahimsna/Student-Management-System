@@ -236,7 +236,7 @@ export default function Students() {
               ====================================================== */}
               {error && (
                 <div className="mt-6 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3.5 text-sm text-red-700">
-                  <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+                  <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
 
                   <p>{error}</p>
                 </div>
@@ -367,7 +367,7 @@ export default function Students() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[950px]">
+                    <table className="w-full min-w-237.5">
                       <thead>
                         <tr className="border-b border-slate-100 bg-slate-50/70">
                           <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-[0.14em] text-slate-400">
@@ -405,7 +405,7 @@ export default function Students() {
                             {/* Student */}
                             <td className="px-6 py-4">
                               <div className="flex items-center gap-3.5">
-                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xs font-bold text-blue-600">
+                                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-xs font-bold text-blue-600">
                                   {getInitials(student.name)}
                                 </div>
 

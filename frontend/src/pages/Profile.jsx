@@ -184,7 +184,7 @@ export default function Profile() {
       {/* =========================================================
           NAVBAR
       ========================================================== */}
-      <div className="relative z-[100]">
+      <div className="relative z-100">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
@@ -195,7 +195,7 @@ export default function Profile() {
         {/* =======================================================
             SIDEBAR
         ======================================================== */}
-        <div className="relative z-[40]">
+        <div className="relative z-40">
           <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         </div>
 

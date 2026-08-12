@@ -267,7 +267,7 @@ export default function TakeAttendance() {
         return;
       }
 
-      const response = await fetch("http://localhost:8007/api/attendance", {
+      const response = await fetch("https://student-management-system-4ud6.onrender.com/api/attendance", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -337,7 +337,7 @@ export default function TakeAttendance() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-900">
       {/* Navbar */}
-      <div className="relative z-[100]">
+      <div className="relative z-100">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
@@ -493,7 +493,7 @@ export default function TakeAttendance() {
 
               {error && (
                 <div className="mt-5 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
-                  <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+                  <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
 
                   <p className="text-sm font-medium text-red-700">{error}</p>
                 </div>
@@ -503,7 +503,7 @@ export default function TakeAttendance() {
                 <div className="mt-5 flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3.5">
                   <CheckCircle2
                     size={17}
-                    className="flex-shrink-0 text-emerald-600"
+                    className="shrink-0 text-emerald-600"
                   />
 
                   <p className="text-sm font-medium text-emerald-700">
@@ -808,7 +808,7 @@ function StudentAttendanceRow({ student, status, onChange, index }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 lg:w-[330px]">
+        <div className="grid grid-cols-3 gap-2 lg:w-82.5">
           <AttendanceButton
             label="Present"
             active={status === "Present"}

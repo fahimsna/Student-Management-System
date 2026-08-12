@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 
-const API_URL = "http://localhost:8007/api/attendance";
+const API_URL = "https://student-management-system-4ud6.onrender.com/api/attendance";
 
 export default function AttendanceReport() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -574,7 +574,7 @@ export default function AttendanceReport() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[850px] text-left">
+                    <table className="w-full min-w-212.5 text-left">
                       <thead>
                         <tr className="border-b border-slate-100 bg-slate-50/70">
                           <th className="px-5 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
@@ -808,7 +808,7 @@ export default function AttendanceReport() {
                             />
                           </div>
 
-                          <div className="min-w-[140px]">
+                          <div className="min-w-35">
                             <div className="mb-1.5 flex justify-between">
                               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
                                 Rate

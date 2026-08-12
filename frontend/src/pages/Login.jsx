@@ -67,7 +67,7 @@ export default function Login() {
             LEFT SIDE
         ====================================================== */}
         <section className="relative hidden overflow-hidden bg-[#eef3f8] lg:flex">
-          <div className="absolute bottom-[-180px] left-[-150px] h-[420px] w-[420px] rounded-full bg-white/70 blur-3xl" />
+          <div className="absolute bottom-45 -left-37.5 h-105 w-105 rounded-full bg-white/70 blur-3xl" />
 
           <div className="relative z-10 flex w-full flex-col px-12 py-10 xl:px-16">
             {/* Brand */}
@@ -110,7 +110,7 @@ export default function Login() {
                 </p>
 
                 {/* Dashboard Preview */}
-                <div className="relative mt-10 max-w-[500px]">
+                <div className="relative mt-10 max-w-125">
                   <div className="rounded-2xl border border-white bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)]">
                     <div className="flex items-center justify-between">
                       <div>
@@ -240,7 +240,7 @@ export default function Login() {
             </div>
           </div>
 
-          <div className="pointer-events-none absolute right-0 top-0 h-full w-20 bg-gradient-to-l from-[#f8fafc] to-transparent" />
+          <div className="pointer-events-none absolute right-0 top-0 h-full w-20 bg-linear-to-l from-[#f8fafc] to-transparent" />
         </section>
 
         {/* =====================================================

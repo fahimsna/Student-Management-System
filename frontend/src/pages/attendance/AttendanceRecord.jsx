@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 
-const API_URL = "http://localhost:8007/api/attendance";
+const API_URL = "https://student-management-system-4ud6.onrender.com/api/attendance";
 
 export default function AttendanceRecord() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -170,7 +170,7 @@ export default function AttendanceRecord() {
           NAVBAR
       ====================================================== */}
 
-      <div className="relative z-[100]">
+      <div className="relative z-100">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
@@ -399,7 +399,7 @@ export default function AttendanceRecord() {
 
               {error && (
                 <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
-                  <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+                  <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-red-500" />
 
                   <p className="text-sm font-medium text-red-700">{error}</p>
                 </div>
@@ -642,7 +642,7 @@ function AttendanceSession({ record, formatDate }) {
 
       <div className="mt-6 overflow-hidden rounded-xl border border-slate-100">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[650px] text-left">
+          <table className="w-full min-w-112.5 text-left">
             <thead>
               <tr className="bg-slate-50">
                 <th className="px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">

@@ -3,7 +3,7 @@ import { Menu, X, GraduationCap } from "lucide-react";
 
 export default function Navbar({ sidebarOpen, setSidebarOpen }) {
   return (
-    <header className="sticky top-0 z-40 h-[72px] border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 h-18 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl">
       <div className="flex h-full items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Left */}
         <div className="flex items-center gap-3">

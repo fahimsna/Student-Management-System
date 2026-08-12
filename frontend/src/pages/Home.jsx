@@ -74,7 +74,7 @@ export default function Home() {
     <div className="min-h-screen overflow-x-hidden bg-white text-slate-900">
       {/* ==================== NAVBAR ==================== */}
       <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-[72px] lg:px-8">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-18 lg:px-8">
           {/* Logo */}
           <Link
             to="/"
@@ -202,7 +202,7 @@ export default function Home() {
 
       <main>
         {/* ==================== HERO ==================== */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-white via-white to-blue-50/50">
+        <section className="relative overflow-hidden bg-linear-to-b from-white via-white to-blue-50/50">
           <div className="absolute -right-32 top-20 h-96 w-96 rounded-full bg-blue-100/60 blur-3xl" />
           <div className="absolute -left-40 bottom-0 h-96 w-96 rounded-full bg-indigo-100/40 blur-3xl" />
 
@@ -275,7 +275,7 @@ export default function Home() {
 
             {/* Dashboard Preview */}
             <div className="relative mx-auto w-full max-w-2xl lg:ml-auto">
-              <div className="absolute inset-8 rounded-[2rem] bg-blue-200/40 blur-2xl" />
+              <div className="absolute inset-8 rounded-4xl bg-blue-200/40 blur-2xl" />
 
               <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
                 {/* Preview Topbar */}
@@ -295,7 +295,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex min-h-[360px]">
+                <div className="flex min-h-90">
                   {/* Preview Sidebar */}
                   <div className="hidden w-28 shrink-0 border-r border-slate-100 bg-slate-50/70 p-3 sm:block">
                     {[
