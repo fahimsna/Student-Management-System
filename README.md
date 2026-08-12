@@ -77,14 +77,13 @@ The project is designed to provide a foundation for managing student information
 | dotenv         | Environment variables |
 | CORS           | Cross-origin requests |
 
-## Development Tools
+## Deployment
 
-* Git
-* GitHub
-* VS Code
-* Postman
-* MongoDB / MongoDB Atlas
-* npm
+| Service       | Purpose             |
+| ------------- | ------------------- |
+| Vercel        | Frontend hosting    |
+| Render        | Backend/API hosting |
+| MongoDB Atlas | Database hosting    |
 
 ---
 
@@ -150,7 +149,7 @@ Make sure you have the following installed:
 * **MongoDB** or a MongoDB Atlas account
 * **Git**
 
-You can verify your Node.js and npm installations with:
+Check your installed versions:
 
 ```bash
 node -v
@@ -175,7 +174,7 @@ cd StudentMS
 
 ---
 
-## 2. Install backend dependencies
+## 2. Install Backend Dependencies
 
 ```bash
 cd backend
@@ -184,7 +183,7 @@ npm install
 
 ---
 
-## 3. Configure backend environment variables
+## 3. Configure Backend Environment Variables
 
 Create a `.env` file inside the `backend` directory:
 
@@ -194,7 +193,7 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 ```
 
-### Example
+Example:
 
 ```env
 PORT=8007
@@ -206,7 +205,7 @@ JWT_SECRET=your_super_secret_jwt_key
 
 ---
 
-# ▶️ Running the Backend
+# ▶️ Running the Backend Locally
 
 From the `backend` directory:
 
@@ -228,7 +227,7 @@ http://localhost:8007/api
 
 ---
 
-# ▶️ Running the Frontend
+# ▶️ Running the Frontend Locally
 
 Open a second terminal.
 
@@ -470,6 +469,8 @@ The application currently uses models for:
 
 The MongoDB connection is configured through the `MONGO_URI` environment variable.
 
+For production, StudentMS uses **MongoDB Atlas**.
+
 ---
 
 # 🧪 API Testing
@@ -480,18 +481,18 @@ Recommended testing flow:
 
 ### Authentication
 
-* Register a user
-* Login
-* Copy the JWT token
-* Use the token in protected requests
+1. Register a user.
+2. Login.
+3. Copy the JWT token.
+4. Use the token in protected requests.
 
 ### Student Management
 
-* Create a student
-* Fetch all students
-* Fetch a specific student
-* Update a student
-* Delete a student
+1. Create a student.
+2. Fetch all students.
+3. Fetch a specific student.
+4. Update a student.
+5. Delete a student.
 
 For protected requests, include:
 
@@ -530,76 +531,156 @@ Authorization: Bearer YOUR_JWT_TOKEN
 * [x] Axios
 * [x] Tailwind CSS
 * [x] Lucide React
-* [ ] Final production API configuration
+* [ ] Production API configuration
 * [ ] Production deployment configuration
 
 ---
 
-# 🔮 Future Improvements
+# 🌐 Production Deployment
 
-The following features can be added as the project continues to grow:
+StudentMS is deployed using the following architecture:
 
-* [ ] Admin and student roles
-* [ ] Role-based access control
-* [ ] Student search
-* [ ] Department filtering
-* [ ] Semester filtering
-* [ ] Pagination
-* [ ] Student profile photos
-* [ ] Dashboard statistics
-* [ ] Attendance management
-* [ ] Marks management
-* [ ] Form validation
-* [ ] Better error handling
-* [ ] Loading states
-* [ ] Toast notifications
-* [ ] Automated tests
-* [ ] API documentation
-* [ ] Production deployment
-* [ ] Custom domain
-
----
-
-# 🌐 Deployment
-
-The application can be deployed using services such as:
+```text
+                     ┌─────────────────────────┐
+                     │         Vercel           │
+                     │                         │
+                     │   React + Vite Frontend │
+                     └────────────┬────────────┘
+                                  │
+                                  │ HTTPS
+                                  │ REST API
+                                  ▼
+                     ┌─────────────────────────┐
+                     │         Render          │
+                     │                         │
+                     │  Node.js + Express API  │
+                     └────────────┬────────────┘
+                                  │
+                                  │ Mongoose
+                                  ▼
+                     ┌─────────────────────────┐
+                     │     MongoDB Atlas       │
+                     │                         │
+                     │        Database         │
+                     └─────────────────────────┘
+```
 
 ### Frontend
 
-* Vercel
+The React/Vite frontend is deployed on **Vercel**.
+
+The frontend communicates with the production backend through the Render API URL.
+
+Example:
+
+```text
+https://your-backend.onrender.com/api
+```
+
+The frontend should **not** use the local development URL in production:
+
+```text
+http://localhost:8007/api
+```
+
+---
 
 ### Backend
 
-* Render
+The Node.js/Express backend is deployed on **Render**.
+
+The backend requires the following environment variables:
+
+```env
+PORT=8007
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_secret_key
+```
+
+These values should be configured through Render's environment variable settings rather than committed to the repository.
+
+---
 
 ### Database
 
-* MongoDB Atlas
+The production database is hosted on **MongoDB Atlas**.
 
-A typical production architecture will look like:
+The backend connects to MongoDB Atlas through:
 
-```text
-                ┌──────────────────────┐
-                │       Vercel         │
-                │   React + Vite App   │
-                └──────────┬───────────┘
-                           │
-                           │ HTTPS / REST API
-                           ▼
-                ┌──────────────────────┐
-                │       Render         │
-                │  Node + Express API  │
-                └──────────┬───────────┘
-                           │
-                           │ Mongoose
-                           ▼
-                ┌──────────────────────┐
-                │    MongoDB Atlas     │
-                │      Database        │
-                └──────────────────────┘
+```env
+MONGO_URI=your_mongodb_connection_string
 ```
 
-Before deployment, make sure all environment variables are configured on the hosting platforms and that the frontend uses the production backend URL instead of `localhost`.
+---
+
+# ⚙️ Production Environment Configuration
+
+## Backend — Render
+
+Configure the following environment variables in Render:
+
+| Variable     | Value                                |
+| ------------ | ------------------------------------ |
+| `PORT`       | `8007`                               |
+| `MONGO_URI`  | Your MongoDB Atlas connection string |
+| `JWT_SECRET` | A strong production secret           |
+
+Do not place production credentials directly in source code.
+
+---
+
+## Frontend — Vercel
+
+The frontend must use the deployed Render backend URL instead of the local backend URL.
+
+### Development
+
+```text
+http://localhost:8007/api
+```
+
+### Production
+
+```text
+https://your-backend.onrender.com/api
+```
+
+The production API URL should be configured through a frontend environment variable.
+
+Example:
+
+```env
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+The frontend can then use the environment variable when making Axios requests.
+
+---
+
+# 🔄 Deployment Flow
+
+The production deployment process is:
+
+```text
+Developer
+    │
+    ▼
+GitHub Repository
+    │
+    ├──────────────────────┐
+    │                      │
+    ▼                      ▼
+ Vercel                  Render
+    │                      │
+    │ Frontend             │ Backend
+    ▼                      ▼
+React + Vite          Node + Express
+                           │
+                           ▼
+                    MongoDB Atlas
+```
+
+When changes are pushed to the GitHub repository, the connected deployment platforms can build and deploy the updated application.
 
 ---
 
@@ -613,29 +694,49 @@ For production deployment:
 * Use a strong and unique `JWT_SECRET`.
 * Use HTTPS.
 * Configure MongoDB Atlas network access appropriately.
-* Restrict CORS to trusted frontend origins.
+* Restrict CORS to the production frontend domain.
 * Validate and sanitize user input.
-* Use secure production environment variables.
+* Store secrets only in deployment environment variables.
+* Do not hardcode production API URLs or credentials.
+* Keep dependencies updated.
 
 ---
 
 # 📌 Environment Variables
+
+## Backend
 
 The backend requires:
 
 | Variable     | Description                     |
 | ------------ | ------------------------------- |
 | `PORT`       | Port used by the Express server |
-| `MONGO_URI`  | MongoDB connection string       |
+| `MONGO_URI`  | MongoDB Atlas connection string |
 | `JWT_SECRET` | Secret used to sign JWT tokens  |
 
 Example:
 
 ```env
 PORT=8007
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
+MONGO_URI=your_mongodb_atlas_uri
+JWT_SECRET=your_production_jwt_secret
 ```
+
+## Frontend
+
+The frontend should use:
+
+| Variable       | Description                |
+| -------------- | -------------------------- |
+| `VITE_API_URL` | Production backend API URL |
+
+Example:
+
+```env
+VITE_API_URL=https://your-backend.onrender.com/api
+```
+
+> Replace the example Render URL with your actual deployed backend URL.
 
 ---
 
@@ -676,6 +777,55 @@ From the `backend` directory:
 ```bash
 node server.js
 ```
+
+---
+
+# 🚀 Deployment Checklist
+
+Before deploying StudentMS, make sure:
+
+* [ ] `.env` is included in `.gitignore`
+* [ ] No MongoDB credentials are committed
+* [ ] No JWT secret is committed
+* [ ] Frontend API URL is configurable
+* [ ] Backend CORS allows the Vercel frontend
+* [ ] MongoDB Atlas database is configured
+* [ ] MongoDB Atlas allows the Render backend to connect
+* [ ] Backend runs successfully on Render
+* [ ] Frontend builds successfully on Vercel
+* [ ] Frontend points to the Render API
+* [ ] Registration works in production
+* [ ] Login works in production
+* [ ] JWT authentication works in production
+* [ ] Student creation works
+* [ ] Student listing works
+* [ ] Student update works
+* [ ] Student deletion works
+
+---
+
+# 🔮 Future Improvements
+
+The following features can be added as the project continues to grow:
+
+* [ ] Admin and student roles
+* [ ] Role-based access control
+* [ ] Student search
+* [ ] Department filtering
+* [ ] Semester filtering
+* [ ] Pagination
+* [ ] Student profile photos
+* [ ] Dashboard statistics
+* [ ] Attendance management
+* [ ] Marks management
+* [ ] Form validation
+* [ ] Better error handling
+* [ ] Loading states
+* [ ] Toast notifications
+* [ ] Automated tests
+* [ ] API documentation
+* [ ] Custom domain
+* [ ] CI/CD improvements
 
 ---
 
