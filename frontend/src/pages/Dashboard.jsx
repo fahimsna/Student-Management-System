@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
@@ -11,6 +12,10 @@ import {
   ArrowUpRight,
   ArrowRight,
   Activity,
+  ClipboardCheck,
+  Clock3,
+  CheckCircle2,
+  AlertCircle,
 } from "lucide-react";
 import { getStudent } from "../api/studentApi";
 
@@ -19,6 +24,8 @@ export default function Dashboard() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -43,36 +50,57 @@ export default function Dashboard() {
     fetchStudents();
   }, []);
 
-  // Active Students
-  const activeStudents = students.filter(
-    (student) => student.status === "Active",
-  ).length;
+  // ============================================================
+  // STUDENT STATISTICS
+  // ============================================================
 
-  // Inactive Students
-  const inactiveStudents = students.filter(
-    (student) => student.status === "Inactive",
-  ).length;
+  const activeStudents = useMemo(() => {
+    return students.filter((student) => student.status === "Active").length;
+  }, [students]);
 
-  // New Students - last 30 days
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const inactiveStudents = useMemo(() => {
+    return students.filter((student) => student.status === "Inactive").length;
+  }, [students]);
 
-  const newStudents = students.filter((student) => {
-    if (!student.createdAt) {
-      return false;
-    }
+  const newStudents = useMemo(() => {
+    const thirtyDaysAgo = new Date();
 
-    const createdDate = new Date(student.createdAt);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-    return createdDate >= thirtyDaysAgo;
-  }).length;
+    return students.filter((student) => {
+      if (!student.createdAt) {
+        return false;
+      }
 
-  // Recent Students
-  const recentStudents = [...students]
-    .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
-    .slice(0, 5);
+      const createdDate = new Date(student.createdAt);
 
-  // Format date
+      return createdDate >= thirtyDaysAgo;
+    }).length;
+  }, [students]);
+
+  // ============================================================
+  // RECENT STUDENTS
+  // ============================================================
+
+  const recentStudents = useMemo(() => {
+    return [...students]
+      .sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0))
+      .slice(0, 5);
+  }, [students]);
+
+  // ============================================================
+  // DATE
+  // ============================================================
+
+  const today = new Date();
+
+  const formattedToday = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+
   const formatDate = (date) => {
     if (!date) {
       return "N/A";
@@ -85,7 +113,10 @@ export default function Dashboard() {
     });
   };
 
-  // Statistics
+  // ============================================================
+  // STATISTICS
+  // ============================================================
+
   const statistics = [
     {
       title: "Total Students",
@@ -123,23 +154,29 @@ export default function Dashboard() {
 
   return (
     <div className="flex min-h-screen flex-col bg-[#f7f9fc] text-slate-900">
-      {/* Navbar */}
+      {/* ========================================================
+          NAVBAR
+      ========================================================= */}
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* Main application layout */}
+      {/* ========================================================
+          MAIN APPLICATION LAYOUT
+      ========================================================= */}
       <div className="flex min-h-0 flex-1">
         {/* Sidebar */}
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Content area */}
+        {/* ======================================================
+            CONTENT
+        ======================================================= */}
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <div className="mx-auto w-full max-w-7xl">
-              {/* =====================================================
+              {/* ==================================================
                   PAGE HEADER
-              ====================================================== */}
+              =================================================== */}
               <div className="mb-8">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                   <div>
                     <div className="mb-2 flex items-center gap-2">
                       <span className="h-2 w-2 rounded-full bg-blue-600" />
@@ -154,38 +191,57 @@ export default function Dashboard() {
                     </h1>
 
                     <p className="mt-2 max-w-xl text-sm leading-6 text-slate-500">
-                      Monitor your student records and keep your management
-                      workspace organized.
+                      Monitor your students, manage records, and keep attendance
+                      organized from one place.
                     </p>
                   </div>
 
-                  <button
-                    onClick={() => {
-                      window.location.href = "/students";
-                    }}
-                    className="group inline-flex w-fit items-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/10"
-                  >
-                    View students
-                    <ArrowRight
-                      size={16}
-                      className="transition-transform group-hover:translate-x-0.5"
-                    />
-                  </button>
+                  <div className="flex flex-col gap-2 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => navigate("/students")}
+                      className="group inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:text-slate-900"
+                    >
+                      View students
+                      <ArrowRight
+                        size={16}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate("/attendance")}
+                      className="group inline-flex items-center justify-center gap-2 rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/10"
+                    >
+                      <ClipboardCheck size={16} />
+                      Take attendance
+                      <ArrowRight
+                        size={16}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* =====================================================
+              {/* ==================================================
                   ERROR
-              ====================================================== */}
+              =================================================== */}
               {error && (
-                <div className="mb-6 rounded-2xl border border-red-100 bg-red-50 px-4 py-3.5 text-sm font-medium text-red-600">
-                  {error}
+                <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3.5">
+                  <AlertCircle
+                    size={18}
+                    className="mt-0.5 shrink-0 text-red-500"
+                  />
+
+                  <p className="text-sm font-medium text-red-600">{error}</p>
                 </div>
               )}
 
-              {/* =====================================================
+              {/* ==================================================
                   STATISTICS
-              ====================================================== */}
+              =================================================== */}
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {statistics.map((stat) => {
                   const Icon = stat.icon;
@@ -232,9 +288,176 @@ export default function Dashboard() {
                 })}
               </div>
 
-              {/* =====================================================
+              {/* ==================================================
+                  ATTENDANCE OVERVIEW
+              =================================================== */}
+              <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.03)]">
+                {/* Header */}
+                <div className="border-b border-slate-100 px-5 py-5 sm:px-6">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                        <ClipboardCheck size={19} />
+                      </div>
+
+                      <div>
+                        <h2 className="text-base font-bold tracking-tight text-slate-900">
+                          Attendance Overview
+                        </h2>
+
+                        <p className="mt-0.5 text-xs text-slate-400">
+                          {formattedToday}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => navigate("/attendance")}
+                      className="group inline-flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
+                    >
+                      Open attendance
+                      <ArrowRight
+                        size={15}
+                        className="transition-transform group-hover:translate-x-0.5"
+                      />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Attendance body */}
+                <div className="p-5 sm:p-6">
+                  <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr]">
+                    {/* Main attendance card */}
+                    <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50/70 p-6">
+                      <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-blue-100/50 blur-2xl" />
+
+                      <div className="relative">
+                        <div className="flex items-start justify-between gap-4">
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">
+                              Today's attendance
+                            </p>
+
+                            <h3 className="mt-2 text-2xl font-bold tracking-[-0.03em] text-slate-900">
+                              Ready to take attendance
+                            </h3>
+
+                            <p className="mt-2 max-w-lg text-sm leading-6 text-slate-500">
+                              Attendance has not been recorded yet. Start
+                              today's attendance session and mark each student's
+                              status.
+                            </p>
+                          </div>
+
+                          <div className="hidden h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-sm sm:flex">
+                            <ClipboardCheck size={22} />
+                          </div>
+                        </div>
+
+                        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                          <button
+                            type="button"
+                            onClick={() => navigate("/attendance")}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-5 text-sm font-bold text-white transition hover:bg-blue-600"
+                          >
+                            <ClipboardCheck size={16} />
+                            Take attendance
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => navigate("/attendance")}
+                            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50"
+                          >
+                            View records
+                            <ArrowRight size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Attendance stats */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                          <CheckCircle2 size={18} />
+                        </div>
+
+                        <p className="mt-4 text-xs font-medium text-slate-400">
+                          Present
+                        </p>
+
+                        <p className="mt-1 text-xl font-bold text-slate-900">
+                          —
+                        </p>
+
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          Not recorded
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-50 text-rose-600">
+                          <UserX size={18} />
+                        </div>
+
+                        <p className="mt-4 text-xs font-medium text-slate-400">
+                          Absent
+                        </p>
+
+                        <p className="mt-1 text-xl font-bold text-slate-900">
+                          —
+                        </p>
+
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          Not recorded
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-50 text-violet-600">
+                          <Users size={18} />
+                        </div>
+
+                        <p className="mt-4 text-xs font-medium text-slate-400">
+                          Not marked
+                        </p>
+
+                        <p className="mt-1 text-xl font-bold text-slate-900">
+                          {loading ? "—" : students.length}
+                        </p>
+
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          All students
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-50 text-amber-600">
+                          <Clock3 size={18} />
+                        </div>
+
+                        <p className="mt-4 text-xs font-medium text-slate-400">
+                          Attendance rate
+                        </p>
+
+                        <p className="mt-1 text-xl font-bold text-slate-900">
+                          —
+                        </p>
+
+                        <p className="mt-1 text-[11px] text-slate-400">
+                          Not available yet
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* ==================================================
                   RECENT ACTIVITY
-              ====================================================== */}
+              =================================================== */}
               <section className="mt-8 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_20px_rgba(15,23,42,0.03)]">
                 {/* Section Header */}
                 <div className="flex flex-col gap-4 border-b border-slate-100 px-5 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
@@ -255,9 +478,8 @@ export default function Dashboard() {
                   </div>
 
                   <button
-                    onClick={() => {
-                      window.location.href = "/students";
-                    }}
+                    type="button"
+                    onClick={() => navigate("/students")}
                     className="group flex items-center gap-1.5 text-sm font-semibold text-slate-500 transition hover:text-blue-600"
                   >
                     View all
@@ -305,9 +527,8 @@ export default function Dashboard() {
                     </p>
 
                     <button
-                      onClick={() => {
-                        window.location.href = "/add-student";
-                      }}
+                      type="button"
+                      onClick={() => navigate("/add-student")}
                       className="mt-5 rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-blue-600"
                     >
                       Add student
@@ -382,7 +603,9 @@ export default function Dashboard() {
                 )}
               </section>
 
-              {/* Bottom information */}
+              {/* ==================================================
+                  BOTTOM INFORMATION
+              =================================================== */}
               {!loading && students.length > 0 && (
                 <div className="mt-5 flex items-center justify-between px-1">
                   <p className="text-xs text-slate-400">

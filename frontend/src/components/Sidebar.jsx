@@ -1,17 +1,35 @@
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
   UserPlus,
   UserCircle,
   ChevronRight,
+  ChevronDown,
   LogOut,
+  ClipboardCheck,
+  ClipboardList,
+  BarChart3,
 } from "lucide-react";
 import Logout from "../pages/Logout";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
-  const menuItems = [
+  const location = useLocation();
+
+  const attendancePaths = [
+    "/attendance/take",
+    "/attendance/records",
+    "/attendance/report",
+  ];
+
+  const attendanceActive = attendancePaths.some((path) =>
+    location.pathname.startsWith(path),
+  );
+
+  const [attendanceOpen, setAttendanceOpen] = useState(attendanceActive);
+
+  const mainMenuItems = [
     {
       name: "Dashboard",
       path: "/dashboard",
@@ -27,16 +45,35 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       path: "/add-student",
       icon: UserPlus,
     },
+  ];
+
+  const attendanceItems = [
     {
-      name: "Profile",
-      path: "/profile",
-      icon: UserCircle,
+      name: "Take Attendance",
+      path: "/attendance/take",
+      icon: ClipboardCheck,
+    },
+    {
+      name: "Attendance Records",
+      path: "/attendance/records",
+      icon: ClipboardList,
+    },
+    {
+      name: "Attendance Report",
+      path: "/attendance/report",
+      icon: BarChart3,
     },
   ];
 
+  const closeMobileSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <>
-      {/* Mobile Overlay */}
+      {/* =====================================================
+          MOBILE OVERLAY
+      ====================================================== */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -44,7 +81,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         />
       )}
 
-      {/* Sidebar */}
+      {/* =====================================================
+          SIDEBAR
+      ====================================================== */}
       <aside
         className={`
           fixed left-0 top-[72px] z-50
@@ -52,39 +91,40 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           flex-col
           border-r border-slate-200
           bg-white
-
           shadow-[8px_0_30px_rgba(15,23,42,0.04)]
-
           transition-transform duration-300 ease-out
 
-          md:static
-          md:h-auto
-          md:min-h-[calc(100vh-72px)]
-          md:translate-x-0
-          md:shadow-none
-
           ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+
+          md:sticky
+          md:top-[72px]
+          md:h-[calc(100vh-72px)]
+          md:min-h-0
+          md:translate-x-0
+          md:self-start
+          md:shadow-none
         `}
       >
-        {/* Navigation */}
+        {/* =================================================
+            NAVIGATION
+        ================================================== */}
         <div className="flex-1 overflow-y-auto px-4 py-7">
-          {/* Section title */}
+          {/* Main Menu */}
           <div className="mb-4 px-3">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
               Main Menu
             </p>
           </div>
 
-          {/* Menu */}
           <nav className="space-y-1.5">
-            {menuItems.map((item) => {
+            {mainMenuItems.map((item) => {
               const Icon = item.icon;
 
               return (
                 <NavLink
                   key={item.path}
                   to={item.path}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={closeMobileSidebar}
                   className={({ isActive }) => `
                     group relative flex items-center gap-3
                     rounded-xl
@@ -101,12 +141,10 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 >
                   {({ isActive }) => (
                     <>
-                      {/* Active indicator */}
                       {isActive && (
                         <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />
                       )}
 
-                      {/* Icon */}
                       <span
                         className={`
                           flex h-9 w-9 shrink-0
@@ -124,10 +162,8 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                         <Icon size={18} strokeWidth={2} />
                       </span>
 
-                      {/* Text */}
                       <span className="flex-1">{item.name}</span>
 
-                      {/* Arrow */}
                       <ChevronRight
                         size={15}
                         className={`
@@ -145,10 +181,194 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 </NavLink>
               );
             })}
+
+            {/* =================================================
+                ATTENDANCE
+            ================================================== */}
+            <button
+              type="button"
+              onClick={() => setAttendanceOpen((previous) => !previous)}
+              className={`
+                group relative flex w-full items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-left
+                text-sm font-semibold
+                transition-all duration-200
+
+                ${
+                  attendanceActive
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }
+              `}
+            >
+              {attendanceActive && (
+                <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />
+              )}
+
+              <span
+                className={`
+                  flex h-9 w-9 shrink-0
+                  items-center justify-center
+                  rounded-lg
+                  transition-all duration-200
+
+                  ${
+                    attendanceActive
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-700"
+                  }
+                `}
+              >
+                <ClipboardCheck size={18} strokeWidth={2} />
+              </span>
+
+              <span className="flex-1">Attendance</span>
+
+              {attendanceOpen ? (
+                <ChevronDown
+                  size={16}
+                  className={
+                    attendanceActive ? "text-blue-400" : "text-slate-300"
+                  }
+                />
+              ) : (
+                <ChevronRight
+                  size={15}
+                  className={
+                    attendanceActive ? "text-blue-400" : "text-slate-300"
+                  }
+                />
+              )}
+            </button>
+
+            {/* Attendance Submenu */}
+            {attendanceOpen && (
+              <div className="ml-5 space-y-1 border-l border-slate-200 pl-3">
+                {attendanceItems.map((item) => {
+                  const Icon = item.icon;
+
+                  return (
+                    <NavLink
+                      key={item.path}
+                      to={item.path}
+                      onClick={closeMobileSidebar}
+                      className={({ isActive }) => `
+                        group flex items-center gap-2.5
+                        rounded-lg
+                        px-3 py-2.5
+                        text-xs font-semibold
+                        transition-all duration-200
+
+                        ${
+                          isActive
+                            ? "bg-blue-50 text-blue-600"
+                            : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                        }
+                      `}
+                    >
+                      {({ isActive }) => (
+                        <>
+                          <span
+                            className={`
+                              flex h-7 w-7 shrink-0
+                              items-center justify-center
+                              rounded-md
+                              transition-colors
+
+                              ${
+                                isActive
+                                  ? "bg-white text-blue-600 shadow-sm"
+                                  : "bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-700"
+                              }
+                            `}
+                          >
+                            <Icon size={15} strokeWidth={2} />
+                          </span>
+
+                          <span className="flex-1">{item.name}</span>
+
+                          {isActive && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-blue-600" />
+                          )}
+                        </>
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
+            )}
+          </nav>
+
+          {/* =================================================
+              ACCOUNT
+          ================================================== */}
+          <div className="mb-4 mt-8 px-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+              Account
+            </p>
+          </div>
+
+          <nav>
+            <NavLink
+              to="/profile"
+              onClick={closeMobileSidebar}
+              className={({ isActive }) => `
+                group relative flex items-center gap-3
+                rounded-xl
+                px-3 py-2.5
+                text-sm font-semibold
+                transition-all duration-200
+
+                ${
+                  isActive
+                    ? "bg-blue-50 text-blue-600"
+                    : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
+                }
+              `}
+            >
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <span className="absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />
+                  )}
+
+                  <span
+                    className={`
+                      flex h-9 w-9 shrink-0
+                      items-center justify-center
+                      rounded-lg
+
+                      ${
+                        isActive
+                          ? "bg-white text-blue-600 shadow-sm"
+                          : "bg-slate-50 text-slate-400 group-hover:bg-white group-hover:text-slate-700"
+                      }
+                    `}
+                  >
+                    <UserCircle size={18} strokeWidth={2} />
+                  </span>
+
+                  <span className="flex-1">Profile</span>
+
+                  <ChevronRight
+                    size={15}
+                    className={
+                      isActive
+                        ? "text-blue-400"
+                        : "text-slate-300 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100"
+                    }
+                  />
+                </>
+              )}
+            </NavLink>
           </nav>
         </div>
 
-        {/* Logout */}
+        {/* =================================================
+            LOGOUT
+        ================================================== */}
         <div className="border-t border-slate-100 p-4">
           <div className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-red-50">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500 transition group-hover:bg-white">

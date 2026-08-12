@@ -9,6 +9,7 @@ import Students from "./pages/Students";
 import EditStudent from "./pages/EditStudent";
 import StudentDetails from "./pages/StudentDetails";
 import Profile from "./pages/Profile";
+import TakeAttendance from "./pages/TakeAttendance";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -82,6 +83,7 @@ function App() {
 
         {/* Fallback */}
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/attendance/take" element={<TakeAttendance />} />
       </Routes>
     </BrowserRouter>
   );
