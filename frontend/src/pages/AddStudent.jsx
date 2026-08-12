@@ -8,8 +8,9 @@ import {
   Mail,
   Building2,
   GraduationCap,
-  ArrowLeft,
   Save,
+  ChevronDown,
+  CheckCircle2,
 } from "lucide-react";
 import { createStudent } from "../api/studentApi";
 
@@ -25,9 +26,7 @@ export default function AddStudent() {
   });
 
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
-
   const [success, setSuccess] = useState("");
 
   const navigate = useNavigate();
@@ -39,6 +38,10 @@ export default function AddStudent() {
       ...previous,
       [name]: value,
     }));
+
+    if (error) {
+      setError("");
+    }
   };
 
   const validateForm = () => {
@@ -50,7 +53,7 @@ export default function AddStudent() {
       return "Please enter student email.";
     }
 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       return "Please enter a valid email address.";
     }
 
@@ -121,83 +124,123 @@ export default function AddStudent() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
-      {/* Navbar */}
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900">
+      {/* =========================================================
+          NAVBAR
+      ========================================================== */}
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-      {/* Main Layout */}
-      <div className="flex flex-1 min-h-0">
-        {/* Sidebar */}
+      {/* =========================================================
+          MAIN LAYOUT
+          Sidebar is intentionally below Navbar so it never
+          visually overlaps the Navbar while scrolling.
+      ========================================================== */}
+      <div className="flex min-h-[calc(100vh-64px)]">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        {/* Right Side */}
-        <div className="flex-1 min-w-0 flex flex-col">
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-4xl mx-auto">
-              {/* Back Button */}
-              <button
-                type="button"
-                onClick={() => navigate("/students")}
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#495057] hover:text-[#212529] transition"
-              >
-                <ArrowLeft size={17} />
-                Back to Students
-              </button>
+        {/* =======================================================
+            RIGHT SIDE
+        ======================================================== */}
+        <div className="flex min-w-0 flex-1 flex-col">
+          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
+            <div className="mx-auto max-w-4xl">
+              {/* =================================================
+                  HEADER
+              ================================================== */}
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="h-1.5 w-1.5 rounded-full bg-blue-600" />
 
-              {/* Header */}
-              <div className="mt-5">
-                <h1 className="text-2xl sm:text-3xl font-bold text-[#212529]">
+                  <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                    Student management
+                  </span>
+                </div>
+
+                <h1 className="text-3xl font-bold tracking-[-0.04em] text-slate-900 sm:text-4xl">
                   Add Student
                 </h1>
 
-                <p className="mt-2 text-sm sm:text-base text-[#6C757D]">
-                  Add a new student to the management system.
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                  Create a new student profile and add them to the management
+                  system.
                 </p>
               </div>
 
-              {/* Form Card */}
-              <div className="mt-6 bg-white border border-[#DEE2E6] rounded-xl shadow-sm">
+              {/* =================================================
+                  FORM CARD
+              ================================================== */}
+              <div className="mt-7 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.035)]">
                 {/* Card Header */}
-                <div className="p-6 border-b border-[#DEE2E6]">
-                  <h2 className="text-lg font-semibold text-[#212529]">
-                    Student Information
-                  </h2>
+                <div className="border-b border-slate-100 px-5 py-5 sm:px-7">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                      <User size={19} />
+                    </div>
 
-                  <p className="text-sm text-[#6C757D] mt-1">
-                    Enter the student's information below.
-                  </p>
+                    <div>
+                      <h2 className="text-sm font-bold text-slate-800">
+                        Student information
+                      </h2>
+
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        Enter the student's details below.
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="p-6">
-                  {/* Error */}
+                {/* =================================================
+                    FORM
+                ================================================== */}
+                <form
+                  onSubmit={handleSubmit}
+                  className="px-5 py-6 sm:px-7 sm:py-7"
+                >
+                  {/* =================================================
+                      ALERTS
+                  ================================================== */}
                   {error && (
-                    <div className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                      {error}
+                    <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
+                      <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
+
+                      <p className="text-sm font-medium text-red-700">
+                        {error}
+                      </p>
                     </div>
                   )}
 
-                  {/* Success */}
                   {success && (
-                    <div className="mb-5 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                      {success}
+                    <div className="mb-5 flex items-center gap-3 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3.5">
+                      <CheckCircle2
+                        size={17}
+                        className="flex-shrink-0 text-emerald-600"
+                      />
+
+                      <p className="text-sm font-medium text-emerald-700">
+                        {success}
+                      </p>
                     </div>
                   )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                    {/* Name */}
+                  {/* =================================================
+                      FORM GRID
+                  ================================================== */}
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    {/* =================================================
+                        NAME
+                    ================================================== */}
                     <div>
                       <label
                         htmlFor="name"
-                        className="block text-sm font-medium text-[#343A40] mb-2"
+                        className="mb-2 block text-xs font-bold text-slate-700"
                       >
-                        Student Name
+                        Student name
                       </label>
 
                       <div className="relative">
                         <User
-                          size={18}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6C757D]"
+                          size={17}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
 
                         <input
@@ -207,24 +250,28 @@ export default function AddStudent() {
                           value={formData.name}
                           onChange={handleChange}
                           placeholder="Enter student name"
-                          className="w-full rounded-lg border border-[#CED4DA] py-2.5 pl-10 pr-4 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
+                          disabled={loading}
+                          autoComplete="name"
+                          className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         />
                       </div>
                     </div>
 
-                    {/* Email */}
+                    {/* =================================================
+                        EMAIL
+                    ================================================== */}
                     <div>
                       <label
                         htmlFor="email"
-                        className="block text-sm font-medium text-[#343A40] mb-2"
+                        className="mb-2 block text-xs font-bold text-slate-700"
                       >
-                        Email
+                        Email address
                       </label>
 
                       <div className="relative">
                         <Mail
-                          size={18}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6C757D]"
+                          size={17}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
 
                         <input
@@ -234,24 +281,28 @@ export default function AddStudent() {
                           value={formData.email}
                           onChange={handleChange}
                           placeholder="student@example.com"
-                          className="w-full rounded-lg border border-[#CED4DA] py-2.5 pl-10 pr-4 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
+                          disabled={loading}
+                          autoComplete="email"
+                          className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         />
                       </div>
                     </div>
 
-                    {/* Department */}
+                    {/* =================================================
+                        DEPARTMENT
+                    ================================================== */}
                     <div>
                       <label
                         htmlFor="department"
-                        className="block text-sm font-medium text-[#343A40] mb-2"
+                        className="mb-2 block text-xs font-bold text-slate-700"
                       >
                         Department
                       </label>
 
                       <div className="relative">
                         <Building2
-                          size={18}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6C757D] pointer-events-none"
+                          size={17}
+                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
 
                         <select
@@ -259,7 +310,8 @@ export default function AddStudent() {
                           name="department"
                           value={formData.department}
                           onChange={handleChange}
-                          className="w-full appearance-none rounded-lg border border-[#CED4DA] bg-white py-2.5 pl-10 pr-4 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
+                          disabled={loading}
+                          className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           <option value="">Select department</option>
 
@@ -277,22 +329,29 @@ export default function AddStudent() {
 
                           <option value="Economics">Economics</option>
                         </select>
+
+                        <ChevronDown
+                          size={16}
+                          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
                       </div>
                     </div>
 
-                    {/* Semester */}
+                    {/* =================================================
+                        SEMESTER
+                    ================================================== */}
                     <div>
                       <label
                         htmlFor="semester"
-                        className="block text-sm font-medium text-[#343A40] mb-2"
+                        className="mb-2 block text-xs font-bold text-slate-700"
                       >
                         Semester
                       </label>
 
                       <div className="relative">
                         <GraduationCap
-                          size={18}
-                          className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6C757D] pointer-events-none"
+                          size={17}
+                          className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
 
                         <select
@@ -300,67 +359,66 @@ export default function AddStudent() {
                           name="semester"
                           value={formData.semester}
                           onChange={handleChange}
-                          className="w-full appearance-none rounded-lg border border-[#CED4DA] bg-white py-2.5 pl-10 pr-4 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
+                          disabled={loading}
+                          className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         >
                           <option value="">Select semester</option>
 
-                          <option value="1">Semester 1</option>
-
-                          <option value="2">Semester 2</option>
-
-                          <option value="3">Semester 3</option>
-
-                          <option value="4">Semester 4</option>
-
-                          <option value="5">Semester 5</option>
-
-                          <option value="6">Semester 6</option>
-
-                          <option value="7">Semester 7</option>
-
-                          <option value="8">Semester 8</option>
-
-                          <option value="9">Semester 9</option>
-
-                          <option value="10">Semester 10</option>
-
-                          <option value="11">Semester 11</option>
-
-                          <option value="12">Semester 12</option>
+                          {Array.from({ length: 12 }, (_, index) => (
+                            <option key={index + 1} value={String(index + 1)}>
+                              Semester {index + 1}
+                            </option>
+                          ))}
                         </select>
+
+                        <ChevronDown
+                          size={16}
+                          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
                       </div>
                     </div>
 
-                    {/* Status */}
-                    <div>
+                    {/* =================================================
+                        STATUS
+                    ================================================== */}
+                    <div className="md:col-span-2">
                       <label
                         htmlFor="status"
-                        className="block text-sm font-medium text-[#343A40] mb-2"
+                        className="mb-2 block text-xs font-bold text-slate-700"
                       >
-                        Status
+                        Student status
                       </label>
 
-                      <select
-                        id="status"
-                        name="status"
-                        value={formData.status}
-                        onChange={handleChange}
-                        className="w-full rounded-lg border border-[#CED4DA] bg-white px-4 py-2.5 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
-                      >
-                        <option value="Active">Active</option>
+                      <div className="relative w-full md:max-w-[calc(50%-0.625rem)]">
+                        <select
+                          id="status"
+                          name="status"
+                          value={formData.status}
+                          onChange={handleChange}
+                          disabled={loading}
+                          className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <option value="Active">Active</option>
+                          <option value="Inactive">Inactive</option>
+                        </select>
 
-                        <option value="Inactive">Inactive</option>
-                      </select>
+                        <ChevronDown
+                          size={16}
+                          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                        />
+                      </div>
                     </div>
                   </div>
 
-                  {/* Buttons */}
-                  <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-3 mt-8 pt-6 border-t border-[#DEE2E6]">
+                  {/* =================================================
+                      ACTIONS
+                  ================================================== */}
+                  <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                     <button
                       type="button"
                       onClick={() => navigate("/students")}
                       disabled={loading}
-                      className="rounded-lg border border-[#CED4DA] bg-white px-5 py-2.5 text-sm font-medium text-[#343A40] transition hover:bg-[#F8F9FA] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="h-11 rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Cancel
                     </button>
@@ -368,11 +426,18 @@ export default function AddStudent() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#212529] px-5 py-2.5 text-sm font-medium text-white transition hover:bg-[#343A40] disabled:cursor-not-allowed disabled:opacity-60"
+                      className="group inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-slate-900 px-6 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-600/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      <Save size={17} />
+                      <Save
+                        size={16}
+                        className={
+                          loading
+                            ? "animate-pulse"
+                            : "transition-transform group-hover:scale-105"
+                        }
+                      />
 
-                      {loading ? "Adding Student..." : "Add Student"}
+                      {loading ? "Adding student..." : "Add student"}
                     </button>
                   </div>
                 </form>

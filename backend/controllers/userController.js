@@ -1,12 +1,12 @@
-let user = require("../models/User");
-let bcrypt = require("bcrypt");
-let jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-let registerUser = async (req, res) => {
+const registerUser = async (req, res) => {
   try {
-    let data = req.body;
+    const data = req.body;
 
-    let existEmail = await user.findOne({
+    const existEmail = await User.findOne({
       email: data.email,
     });
 
@@ -19,49 +19,49 @@ let registerUser = async (req, res) => {
 
     data.password = await bcrypt.hash(data.password, 10);
 
-    let newUser = new user(data);
+    const newUser = new User(data);
 
-    let result = await newUser.save();
+    const result = await newUser.save();
 
     res.status(201).json({
       status: 1,
-      message: "Registration Successfull",
+      message: "Registration Successful",
       data: result,
     });
   } catch (error) {
     res.status(500).json({
       status: 0,
-      message: "Registration failled",
+      message: "Registration failed",
       error: error.message,
     });
   }
 };
 
-let loginUser = async (req, res) => {
+const loginUser = async (req, res) => {
   try {
-    let data = req.body;
+    const data = req.body;
 
-    let validEmail = await user.findOne({
+    const validEmail = await User.findOne({
       email: data.email,
     });
 
     if (!validEmail) {
       return res.status(400).json({
         status: 0,
-        message: "Please Enter a valid email address",
+        message: "Please enter a valid email address",
       });
     }
 
-    let passMatch = await bcrypt.compare(data.password, validEmail.password);
+    const passMatch = await bcrypt.compare(data.password, validEmail.password);
 
     if (!passMatch) {
       return res.status(400).json({
         status: 0,
-        message: "Please Enter a valid password",
+        message: "Please enter a valid password",
       });
     }
 
-    let token = jwt.sign(
+    const token = jwt.sign(
       {
         id: validEmail._id,
       },
@@ -73,7 +73,7 @@ let loginUser = async (req, res) => {
 
     res.status(200).json({
       status: 1,
-      message: "Successfully Logged in",
+      message: "Successfully logged in",
       token,
     });
   } catch (error) {
@@ -85,9 +85,9 @@ let loginUser = async (req, res) => {
   }
 };
 
-let getProfile = async (req, res) => {
+const getProfile = async (req, res) => {
   try {
-    let userData = await user.findById(req.user.id).select("-password");
+    const userData = await User.findById(req.user.id).select("-password");
 
     if (!userData) {
       return res.status(404).json({
@@ -112,8 +112,83 @@ let getProfile = async (req, res) => {
   }
 };
 
+const updateProfile = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({
+        status: 0,
+        message: "Name is required",
+      });
+    }
+
+    if (!email || !email.trim()) {
+      return res.status(400).json({
+        status: 0,
+        message: "Email is required",
+      });
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailRegex.test(email.trim())) {
+      return res.status(400).json({
+        status: 0,
+        message: "Please enter a valid email address",
+      });
+    }
+
+    const existingUser = await User.findOne({
+      email: email.trim(),
+      _id: { $ne: req.user.id },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({
+        status: 0,
+        message: "Email is already being used by another account",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      {
+        name: name.trim(),
+        email: email.trim(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        status: 0,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: 1,
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.log("Update Profile Error:", error);
+
+    res.status(500).json({
+      status: 0,
+      message: "Failed to update profile",
+      error: error.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   loginUser,
   getProfile,
+  updateProfile,
 };

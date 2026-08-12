@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
+import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -15,15 +16,14 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Default */}
-        <Route path="/" element={<Navigate to="/login" />} />
+        {/* Public Home */}
+        <Route path="/" element={<Home />} />
 
         {/* Authentication */}
         <Route path="/login" element={<Login />} />
-
         <Route path="/register" element={<Register />} />
 
-        {/* Dashboard */}
+        {/* Protected Dashboard */}
         <Route
           path="/dashboard"
           element={
@@ -43,7 +43,6 @@ function App() {
           }
         />
 
-        {/* Student Details */}
         <Route
           path="/students/:id"
           element={
@@ -53,7 +52,6 @@ function App() {
           }
         />
 
-        {/* Add Student */}
         <Route
           path="/add-student"
           element={
@@ -63,7 +61,6 @@ function App() {
           }
         />
 
-        {/* Edit Student */}
         <Route
           path="/students/edit/:id"
           element={
@@ -82,6 +79,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );

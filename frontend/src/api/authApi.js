@@ -1,11 +1,17 @@
 import axiosInstance from "./axiosInstance";
 
-export let registerUser = (data) => {
+export const registerUser = (data) => {
   return axiosInstance.post("/register", data);
 };
-export let loginUser = (data) => {
+
+export const loginUser = (data) => {
   return axiosInstance.post("/login", data);
 };
-export let getProfile = () => {
+
+export const getProfile = () => {
   return axiosInstance.get("/profile");
+};
+
+export const updateProfile = (data) => {
+  return axiosInstance.put("/profile", data);
 };
