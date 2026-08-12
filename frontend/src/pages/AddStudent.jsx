@@ -57,12 +57,12 @@ export default function AddStudent() {
       return "Please enter a valid email address.";
     }
 
-    if (!formData.department) {
-      return "Please select a department.";
+    if (!formData.department.trim()) {
+      return "Please enter a department.";
     }
 
     if (!formData.semester) {
-      return "Please select a semester.";
+      return "Please select a semester or class.";
     }
 
     if (!formData.status) {
@@ -91,7 +91,7 @@ export default function AddStudent() {
       const result = await createStudent({
         name: formData.name.trim(),
         email: formData.email.trim(),
-        department: formData.department,
+        department: formData.department.trim(),
         semester: formData.semester,
         status: formData.status,
       });
@@ -132,15 +132,13 @@ export default function AddStudent() {
 
       {/* =========================================================
           MAIN LAYOUT
-          Sidebar is intentionally below Navbar so it never
-          visually overlaps the Navbar while scrolling.
       ========================================================== */}
       <div className="flex min-h-[calc(100vh-64px)]">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
         {/* =======================================================
             RIGHT SIDE
-        ======================================================== */}
+        ========================================================= */}
         <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <div className="mx-auto max-w-4xl">
@@ -305,47 +303,32 @@ export default function AddStudent() {
                           className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
 
-                        <select
+                        <input
                           id="department"
+                          type="text"
                           name="department"
                           value={formData.department}
                           onChange={handleChange}
+                          placeholder="e.g. Computer Science"
                           disabled={loading}
-                          className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          <option value="">Select department</option>
-
-                          <option value="CSE">
-                            Computer Science & Engineering
-                          </option>
-
-                          <option value="EEE">
-                            Electrical & Electronic Engineering
-                          </option>
-
-                          <option value="BBA">Business Administration</option>
-
-                          <option value="Architecture">Architecture</option>
-
-                          <option value="Economics">Economics</option>
-                        </select>
-
-                        <ChevronDown
-                          size={16}
-                          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                          className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         />
                       </div>
+
+                      <p className="mt-1.5 text-[10px] text-slate-400">
+                        Enter any department, program, or faculty name.
+                      </p>
                     </div>
 
                     {/* =================================================
-                        SEMESTER
+                        SEMESTER / CLASS
                     ================================================== */}
                     <div>
                       <label
                         htmlFor="semester"
                         className="mb-2 block text-xs font-bold text-slate-700"
                       >
-                        Semester
+                        Semester / Class
                       </label>
 
                       <div className="relative">
@@ -362,13 +345,31 @@ export default function AddStudent() {
                           disabled={loading}
                           className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          <option value="">Select semester</option>
+                          <option value="">Select semester / class</option>
 
-                          {Array.from({ length: 12 }, (_, index) => (
-                            <option key={index + 1} value={String(index + 1)}>
-                              Semester {index + 1}
-                            </option>
-                          ))}
+                          <option value="Class 1">Class 1</option>
+                          <option value="Class 2">Class 2</option>
+                          <option value="Class 3">Class 3</option>
+                          <option value="Class 4">Class 4</option>
+                          <option value="Class 5">Class 5</option>
+                          <option value="Class 6">Class 6</option>
+                          <option value="Class 7">Class 7</option>
+                          <option value="Class 8">Class 8</option>
+                          <option value="Class 9">Class 9</option>
+                          <option value="Class 10">Class 10</option>
+
+                          <option value="Semester 1">Semester 1</option>
+                          <option value="Semester 2">Semester 2</option>
+                          <option value="Semester 3">Semester 3</option>
+                          <option value="Semester 4">Semester 4</option>
+                          <option value="Semester 5">Semester 5</option>
+                          <option value="Semester 6">Semester 6</option>
+                          <option value="Semester 7">Semester 7</option>
+                          <option value="Semester 8">Semester 8</option>
+                          <option value="Semester 9">Semester 9</option>
+                          <option value="Semester 10">Semester 10</option>
+                          <option value="Semester 11">Semester 11</option>
+                          <option value="Semester 12">Semester 12</option>
                         </select>
 
                         <ChevronDown
@@ -376,6 +377,10 @@ export default function AddStudent() {
                           className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
                         />
                       </div>
+
+                      <p className="mt-1.5 text-[10px] text-slate-400">
+                        Choose the student's current class or semester.
+                      </p>
                     </div>
 
                     {/* =================================================

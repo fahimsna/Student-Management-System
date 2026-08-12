@@ -9,7 +9,6 @@ import {
   Building2,
   GraduationCap,
   Save,
-  ChevronDown,
   CheckCircle2,
 } from "lucide-react";
 import { getSingleStudent, updateStudent } from "../api/studentApi";
@@ -55,9 +54,12 @@ export default function EditStudent() {
           status: student.status || "Active",
         });
       } catch (error) {
-        console.log(error);
+        console.log("Load Student Error:", error);
 
-        setError(error.response?.data?.message || "Failed to load student.");
+        setError(
+          error.response?.data?.message ||
+            "Failed to load student information.",
+        );
       } finally {
         setLoading(false);
       }
@@ -73,6 +75,10 @@ export default function EditStudent() {
       ...previous,
       [name]: value,
     }));
+
+    if (error) {
+      setError("");
+    }
   };
 
   const validateForm = () => {
@@ -84,17 +90,16 @@ export default function EditStudent() {
       return "Please enter student email.";
     }
 
-    // Fixed email validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       return "Please enter a valid email address.";
     }
 
-    if (!formData.department) {
-      return "Please select a department.";
+    if (!formData.department.trim()) {
+      return "Please enter a department.";
     }
 
     if (!formData.semester) {
-      return "Please select a semester.";
+      return "Please select semester or class.";
     }
 
     if (!formData.status) {
@@ -123,7 +128,7 @@ export default function EditStudent() {
       const result = await updateStudent(id, {
         name: formData.name.trim(),
         email: formData.email.trim(),
-        department: formData.department,
+        department: formData.department.trim(),
         semester: formData.semester,
         status: formData.status,
       });
@@ -138,7 +143,10 @@ export default function EditStudent() {
     } catch (error) {
       console.log("Update Student Error:", error);
 
-      setError(error.response?.data?.message || "Failed to update student.");
+      setError(
+        error.response?.data?.message ||
+          "Failed to update student. Please try again.",
+      );
     } finally {
       setSaving(false);
     }
@@ -184,7 +192,7 @@ export default function EditStudent() {
                   Edit Student
                 </h1>
 
-                <p className="mt-2 text-sm leading-6 text-slate-500">
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
                   Update the student's information and save your changes.
                 </p>
               </div>
@@ -245,7 +253,9 @@ export default function EditStudent() {
                     </div>
                   </div>
 
-                  {/* Form */}
+                  {/* =================================================
+                      FORM
+                  ================================================== */}
                   <form
                     onSubmit={handleSubmit}
                     className="px-5 py-6 sm:px-7 sm:py-7"
@@ -253,7 +263,6 @@ export default function EditStudent() {
                     {/* =================================================
                         ALERTS
                     ================================================== */}
-
                     {error && (
                       <div className="mb-5 flex items-start gap-3 rounded-xl border border-red-100 bg-red-50 px-4 py-3.5">
                         <div className="mt-1 h-2 w-2 flex-shrink-0 rounded-full bg-red-500" />
@@ -280,9 +289,10 @@ export default function EditStudent() {
                     {/* =================================================
                         FORM GRID
                     ================================================== */}
-
                     <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                      {/* Name */}
+                      {/* =================================================
+                          NAME
+                      ================================================== */}
                       <div>
                         <label
                           htmlFor="name"
@@ -304,12 +314,16 @@ export default function EditStudent() {
                             value={formData.name}
                             onChange={handleChange}
                             placeholder="Enter student name"
-                            className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                            disabled={saving}
+                            autoComplete="name"
+                            className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           />
                         </div>
                       </div>
 
-                      {/* Email */}
+                      {/* =================================================
+                          EMAIL
+                      ================================================== */}
                       <div>
                         <label
                           htmlFor="email"
@@ -331,12 +345,16 @@ export default function EditStudent() {
                             value={formData.email}
                             onChange={handleChange}
                             placeholder="student@example.com"
-                            className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                            disabled={saving}
+                            autoComplete="email"
+                            className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           />
                         </div>
                       </div>
 
-                      {/* Department */}
+                      {/* =================================================
+                          DEPARTMENT - FREE TEXT
+                      ================================================== */}
                       <div>
                         <label
                           htmlFor="department"
@@ -348,47 +366,35 @@ export default function EditStudent() {
                         <div className="relative">
                           <Building2
                             size={17}
-                            className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
                           />
 
-                          <select
+                          <input
                             id="department"
+                            type="text"
                             name="department"
                             value={formData.department}
                             onChange={handleChange}
-                            className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                          >
-                            <option value="">Select department</option>
-
-                            <option value="CSE">
-                              Computer Science & Engineering
-                            </option>
-
-                            <option value="EEE">
-                              Electrical & Electronic Engineering
-                            </option>
-
-                            <option value="BBA">Business Administration</option>
-
-                            <option value="Architecture">Architecture</option>
-
-                            <option value="Economics">Economics</option>
-                          </select>
-
-                          <ChevronDown
-                            size={16}
-                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
+                            placeholder="Enter department"
+                            disabled={saving}
+                            className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-4 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           />
                         </div>
+
+                        <p className="mt-1.5 text-[10px] text-slate-400">
+                          Enter any department name.
+                        </p>
                       </div>
 
-                      {/* Semester */}
+                      {/* =================================================
+                          SEMESTER / CLASS
+                      ================================================== */}
                       <div>
                         <label
                           htmlFor="semester"
                           className="mb-2 block text-xs font-bold text-slate-700"
                         >
-                          Semester
+                          Semester / Class
                         </label>
 
                         <div className="relative">
@@ -402,25 +408,56 @@ export default function EditStudent() {
                             name="semester"
                             value={formData.semester}
                             onChange={handleChange}
-                            className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                            disabled={saving}
+                            className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 pl-11 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           >
-                            <option value="">Select semester</option>
+                            <option value="">Select semester / class</option>
 
-                            {Array.from({ length: 12 }, (_, index) => (
-                              <option key={index + 1} value={String(index + 1)}>
-                                Semester {index + 1}
-                              </option>
-                            ))}
+                            <optgroup label="University / Semester">
+                              {Array.from({ length: 12 }, (_, index) => (
+                                <option
+                                  key={`semester-${index + 1}`}
+                                  value={`Semester ${index + 1}`}
+                                >
+                                  Semester {index + 1}
+                                </option>
+                              ))}
+                            </optgroup>
+
+                            <optgroup label="School / Class">
+                              {Array.from({ length: 12 }, (_, index) => (
+                                <option
+                                  key={`class-${index + 1}`}
+                                  value={`Class ${index + 1}`}
+                                >
+                                  Class {index + 1}
+                                </option>
+                              ))}
+                            </optgroup>
                           </select>
 
-                          <ChevronDown
-                            size={16}
-                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-                          />
+                          <svg
+                            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.51a.75.75 0 01-1.08 0l-4.25-4.51a.75.75 0 01.02-1.06z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                         </div>
+
+                        <p className="mt-1.5 text-[10px] text-slate-400">
+                          Choose the student's semester or school class.
+                        </p>
                       </div>
 
-                      {/* Status */}
+                      {/* =================================================
+                          STATUS
+                      ================================================== */}
                       <div className="md:col-span-2">
                         <label
                           htmlFor="status"
@@ -435,17 +472,25 @@ export default function EditStudent() {
                             name="status"
                             value={formData.status}
                             onChange={handleChange}
-                            className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 pr-10 text-sm text-slate-800 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                            disabled={saving}
+                            className="h-12 w-full appearance-none rounded-xl border border-slate-200 bg-slate-50/50 px-4 pr-10 text-sm text-slate-800 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                           >
                             <option value="Active">Active</option>
-
                             <option value="Inactive">Inactive</option>
                           </select>
 
-                          <ChevronDown
-                            size={16}
-                            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400"
-                          />
+                          <svg
+                            className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            aria-hidden="true"
+                          >
+                            <path
+                              fillRule="evenodd"
+                              d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25-4.51a.75.75 0 011.08 1.04l-4.25-4.51a.75.75 0 01.02-1.06z"
+                              clipRule="evenodd"
+                            />
+                          </svg>
                         </div>
                       </div>
                     </div>
@@ -453,7 +498,6 @@ export default function EditStudent() {
                     {/* =================================================
                         ACTIONS
                     ================================================== */}
-
                     <div className="mt-8 flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                       <button
                         type="button"
@@ -473,7 +517,7 @@ export default function EditStudent() {
                           size={16}
                           className={
                             saving
-                              ? ""
+                              ? "animate-pulse"
                               : "transition-transform group-hover:scale-105"
                           }
                         />
@@ -487,7 +531,6 @@ export default function EditStudent() {
             </div>
           </main>
 
-          {/* Footer */}
           <Footer />
         </div>
       </div>
