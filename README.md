@@ -1,6 +1,6 @@
-# 🎓 studentMS — Student Management System
+# 🎓 StudentMS — Student Management System
 
-**studentMS** is a full-stack Student Management System built using the **MERN stack**. It provides a RESTful backend API for user authentication and student management, with a modern React frontend powered by Vite.
+**StudentMS** is a full-stack Student Management System built using the **MERN stack**. It provides a RESTful backend API for user authentication and student management, with a modern React frontend powered by Vite.
 
 The project is designed to provide a foundation for managing student information securely through authenticated API operations.
 
@@ -91,7 +91,7 @@ The project is designed to provide a foundation for managing student information
 # 📁 Project Structure
 
 ```text
-studentMS/
+StudentMS/
 │
 ├── backend/
 │   │
@@ -139,7 +139,7 @@ studentMS/
 
 # 🚀 Getting Started
 
-Follow the steps below to run **studentMS** locally.
+Follow the steps below to run **StudentMS** locally.
 
 ## Prerequisites
 
@@ -170,7 +170,7 @@ git clone <your-repository-url>
 Move into the project:
 
 ```bash
-cd studentMS
+cd StudentMS
 ```
 
 ---
@@ -198,11 +198,11 @@ JWT_SECRET=your_secret_key
 
 ```env
 PORT=8007
-MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/studentMS
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/StudentMS
 JWT_SECRET=your_super_secret_jwt_key
 ```
 
-**Never commit your `.env` file to GitHub.**
+> **Never commit your `.env` file to GitHub.**
 
 ---
 
@@ -448,7 +448,7 @@ The application uses JWT to protect student-related operations.
                  401 Error     Student Route
                                    │
                                    ▼
-                              Controller
+                               Controller
                                    │
                                    ▼
                                 Mongoose
@@ -461,7 +461,7 @@ The application uses JWT to protect student-related operations.
 
 # 🗄️ Database
 
-studentMS uses **MongoDB** as its database and **Mongoose** as the ODM.
+StudentMS uses **MongoDB** as its database and **Mongoose** as the ODM.
 
 The application currently uses models for:
 
@@ -651,13 +651,13 @@ From the `frontend` directory:
 npm run dev
 ```
 
-### Production build
+### Production Build
 
 ```bash
 npm run build
 ```
 
-### Preview production build
+### Preview Production Build
 
 ```bash
 npm run preview
@@ -733,7 +733,7 @@ This project is currently intended for **educational and portfolio purposes**.
 
 ---
 
-## ⭐ studentMS
+## ⭐ StudentMS
 
 A full-stack student management application built with the MERN stack, with a focus on authentication, REST APIs, database management, and modern web development.
 
