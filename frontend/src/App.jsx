@@ -5,6 +5,8 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import AddStudent from "./pages/AddStudent";
 import Students from "./pages/Students";
+import EditStudent from "./pages/EditStudent";
+import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -15,8 +17,9 @@ function App() {
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/login" />} />
 
-        {/* Authentication Routes */}
+        {/* Authentication */}
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
 
         {/* Dashboard */}
@@ -45,6 +48,26 @@ function App() {
           element={
             <ProtectedRoute>
               <AddStudent />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Edit Student */}
+        <Route
+          path="/students/edit/:id"
+          element={
+            <ProtectedRoute>
+              <EditStudent />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Profile */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
             </ProtectedRoute>
           }
         />

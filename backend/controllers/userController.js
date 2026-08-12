@@ -9,29 +9,34 @@ let registerUser = async (req, res) => {
     let existEmail = await user.findOne({
       email: data.email,
     });
+
     if (existEmail) {
       return res.status(403).json({
         status: 0,
         message: "Email exists",
       });
     }
+
     data.password = await bcrypt.hash(data.password, 10);
+
     let newUser = new user(data);
+
     let result = await newUser.save();
 
     res.status(201).json({
       status: 1,
       message: "Registration Successfull",
-      data,
+      data: result,
     });
   } catch (error) {
     res.status(500).json({
       status: 0,
       message: "Registration failled",
-      error,
+      error: error.message,
     });
   }
 };
+
 let loginUser = async (req, res) => {
   try {
     let data = req.body;
@@ -56,9 +61,15 @@ let loginUser = async (req, res) => {
       });
     }
 
-    let token = jwt.sign({ id: validEmail._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
+    let token = jwt.sign(
+      {
+        id: validEmail._id,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
 
     res.status(200).json({
       status: 1,
@@ -69,9 +80,40 @@ let loginUser = async (req, res) => {
     res.status(500).json({
       status: 0,
       message: "Failed to login",
-      error,
+      error: error.message,
     });
   }
 };
 
-module.exports = { registerUser, loginUser };
+let getProfile = async (req, res) => {
+  try {
+    let userData = await user.findById(req.user.id).select("-password");
+
+    if (!userData) {
+      return res.status(404).json({
+        status: 0,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      status: 1,
+      message: "Authentication successful",
+      user: userData,
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      status: 0,
+      message: "Failed to load profile",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = {
+  registerUser,
+  loginUser,
+  getProfile,
+};
