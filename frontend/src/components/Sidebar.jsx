@@ -1,5 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { LayoutDashboard, Users, UserPlus, UserCircle } from "lucide-react";
 import Logout from "../pages/Logout";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -35,46 +36,68 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
       >
         {/* Navigation */}
         <div className="p-4 space-y-2">
+          {/* Dashboard */}
           <NavLink
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `block px-4 py-3 rounded-md transition duration-200 ${
+              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            Dashboard
+            <LayoutDashboard size={19} />
+            <span>Dashboard</span>
           </NavLink>
 
+          {/* Students */}
           <NavLink
             to="/students"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `block px-4 py-3 rounded-md transition duration-200 ${
+              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            Students
+            <Users size={19} />
+            <span>Students</span>
           </NavLink>
 
+          {/* Add Student */}
+          <NavLink
+            to="/add-student"
+            onClick={() => setSidebarOpen(false)}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
+                isActive
+                  ? "bg-[#343A40] text-white"
+                  : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
+              }`
+            }
+          >
+            <UserPlus size={19} />
+            <span>Add Student</span>
+          </NavLink>
+
+          {/* Profile */}
           <NavLink
             to="/profile"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `block px-4 py-3 rounded-md transition duration-200 ${
+              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            Profile
+            <UserCircle size={19} />
+            <span>Profile</span>
           </NavLink>
         </div>
 
