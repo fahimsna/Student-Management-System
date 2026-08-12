@@ -1,22 +1,44 @@
-let mongoose = require("mongoose");
-let studentSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const mongoose = require("mongoose");
+
+const studentSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+
+    department: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    semester: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["Active", "Inactive"],
+      default: "Active",
+    },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
+  {
+    timestamps: true,
   },
-  department: {
-    type: String,
-    required: true,
-  },
-  semester: {
-    type: String,
-    required: true,
-  },
-});
-let student = mongoose.model("Students", studentSchema);
-module.exports = student;
+);
+
+const Student = mongoose.model("Students", studentSchema);
+
+module.exports = Student;

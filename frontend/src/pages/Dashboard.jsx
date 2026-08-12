@@ -10,11 +10,11 @@ export default function Dashboard() {
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    let fetchStudents = async () => {
+    const fetchStudents = async () => {
       try {
-        let result = await getStudent();
+        const result = await getStudent();
 
-        console.log(result);
+        console.log("Students:", result.data.students);
 
         setStudents(result.data.students);
       } catch (error) {
@@ -24,6 +24,35 @@ export default function Dashboard() {
 
     fetchStudents();
   }, []);
+
+  // Total Students
+  const totalStudents = students.length;
+
+  // Active Students
+  const activeStudents = students.filter(
+    (student) => student.status === "Active",
+  ).length;
+
+  // Inactive Students
+  const inactiveStudents = students.filter(
+    (student) => student.status === "Inactive",
+  ).length;
+
+  // New Students
+  // Students created within the last 7 days
+  const sevenDaysAgo = new Date();
+
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+  const newStudents = students.filter((student) => {
+    if (!student.createdAt) {
+      return false;
+    }
+
+    const createdDate = new Date(student.createdAt);
+
+    return createdDate >= sevenDaysAgo;
+  }).length;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F9FA]">
@@ -60,7 +89,7 @@ export default function Dashboard() {
                       <p className="text-sm text-[#6C757D]">Total Students</p>
 
                       <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                        {students.length}
+                        {totalStudents}
                       </h2>
                     </div>
 
@@ -77,7 +106,7 @@ export default function Dashboard() {
                       <p className="text-sm text-[#6C757D]">Active Students</p>
 
                       <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                        98
+                        {activeStudents}
                       </h2>
                     </div>
 
@@ -94,7 +123,7 @@ export default function Dashboard() {
                       <p className="text-sm text-[#6C757D]">New Students</p>
 
                       <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                        12
+                        {newStudents}
                       </h2>
                     </div>
 
@@ -113,7 +142,7 @@ export default function Dashboard() {
                       </p>
 
                       <h2 className="text-3xl font-bold text-[#212529] mt-2">
-                        22
+                        {inactiveStudents}
                       </h2>
                     </div>
 

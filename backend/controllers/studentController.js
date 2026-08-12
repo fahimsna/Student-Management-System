@@ -1,122 +1,168 @@
-const student = require("../models/Student");
-const user = require("../models/User");
+const Student = require("../models/Student");
 
-let createStudent = async (req, res) => {
+// Create Student
+const createStudent = async (req, res) => {
   try {
-    let data = req.body;
-    let existEmail = await student.findOne({
-      email: data.email,
-    });
-    if (existEmail) {
-      return res.status(403).json({
-        status: 0,
-        message: "Email Exists",
+    const { name, email, department, semester, status } = req.body;
+
+    // Check required fields
+    if (!name || !email || !department || !semester) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required",
       });
     }
-    let newStudent = new student(data);
-    let result = await newStudent.save();
+
+    // Check if email already exists
+    const existEmail = await Student.findOne({ email });
+
+    if (existEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Student with this email already exists",
+      });
+    }
+
+    // Create student
+    const student = await Student.create({
+      name,
+      email,
+      department,
+      semester,
+      status: status || "Active",
+    });
+
     res.status(201).json({
-      status: 1,
-      message: "Student Added",
-      result,
+      success: true,
+      message: "Student created successfully",
+      student,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      status: 0,
-      message: "Failed to Add Student",
-      error,
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
 
-let getStudent = async (req, res) => {
+// Get All Students
+const getStudent = async (req, res) => {
   try {
-    let students = await student.find();
+    const students = await Student.find().sort({
+      createdAt: -1,
+    });
+
     res.status(200).json({
-      status: 1,
-      message: "Successfully fetched all Students",
+      success: true,
       students,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      status: 0,
-      message: "Failed to find Student",
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
-let getSingleStudent = async (req, res) => {
+
+// Get Single Student
+const getSingleStudent = async (req, res) => {
   try {
-    let data = req.params.id;
-    let result = await student.findById(data);
-    if (!result) {
+    const student = await Student.findById(req.params.id);
+
+    if (!student) {
       return res.status(404).json({
-        status: 0,
-        message: "Couldn't find any student",
+        success: false,
+        message: "Student not found",
       });
     }
 
     res.status(200).json({
-      status: 1,
-      message: "Fetched the particular Student",
-      result,
+      success: true,
+      student,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      status: 0,
-      message: "Failed to find Student",
-      error,
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
-let updateStudent = async (req, res) => {
+
+// Update Student
+const updateStudent = async (req, res) => {
   try {
-    let id = req.params.id;
-    let data = req.body;
+    const { name, email, department, semester, status } = req.body;
 
-    let result = await student.findOneAndUpdate({ _id: id }, data, {
-      new: true,
-    });
+    const student = await Student.findByIdAndUpdate(
+      req.params.id,
+      {
+        name,
+        email,
+        department,
+        semester,
+        status,
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
 
-    if (!result) {
+    if (!student) {
       return res.status(404).json({
-        status: 0,
-        message: "Couldn't find any student",
+        success: false,
+        message: "Student not found",
       });
     }
 
     res.status(200).json({
-      status: 1,
-      message: "Updated Successfully",
-      result,
+      success: true,
+      message: "Student updated successfully",
+      student,
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      status: 0,
-      message: "Failed to Update Student",
-      error,
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
-let deleteStudent = async (req, res) => {
+
+// Delete Student
+const deleteStudent = async (req, res) => {
   try {
-    let id = req.params.id;
-    let result = await student.findByIdAndDelete(id);
-    if (!result) {
+    const student = await Student.findByIdAndDelete(req.params.id);
+
+    if (!student) {
       return res.status(404).json({
-        status: 0,
-        message: "Couldn't find Student",
+        success: false,
+        message: "Student not found",
       });
     }
+
     res.status(200).json({
-      status: 1,
-      message: "Student deleted",
-      result,
+      success: true,
+      message: "Student deleted successfully",
     });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
-      status: 0,
-      message: "Failed to Delete Student",
-      error,
+      success: false,
+      message: "Server error",
+      error: error.message,
     });
   }
 };
