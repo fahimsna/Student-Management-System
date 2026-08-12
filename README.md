@@ -567,12 +567,10 @@ The application can be deployed using services such as:
 ### Frontend
 
 * Vercel
-* Netlify
 
 ### Backend
 
 * Render
-* Railway
 
 ### Database
 
