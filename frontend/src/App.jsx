@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import AddStudent from "./pages/AddStudent";
 import Students from "./pages/Students";
 import EditStudent from "./pages/EditStudent";
+import StudentDetails from "./pages/StudentDetails";
 import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,7 +15,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Default Route */}
+        {/* Default */}
         <Route path="/" element={<Navigate to="/login" />} />
 
         {/* Authentication */}
@@ -38,6 +39,16 @@ function App() {
           element={
             <ProtectedRoute>
               <Students />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Student Details */}
+        <Route
+          path="/students/:id"
+          element={
+            <ProtectedRoute>
+              <StudentDetails />
             </ProtectedRoute>
           }
         />

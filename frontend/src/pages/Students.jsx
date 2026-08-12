@@ -2,16 +2,21 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
-import { Search, Trash2, Edit, UserPlus, Users } from "lucide-react";
+import { Search, Trash2, Edit, UserPlus, Users, Eye } from "lucide-react";
 import { deleteStudent, getStudent } from "../api/studentApi";
 import { useNavigate } from "react-router-dom";
 
 export default function Students() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
   const [students, setStudents] = useState([]);
+
   const [searchTerm, setSearchTerm] = useState("");
+
   const [statusFilter, setStatusFilter] = useState("All");
+
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState("");
 
   const navigate = useNavigate();
@@ -25,7 +30,7 @@ export default function Students() {
 
       console.log("Students:", result.data.students);
 
-      setStudents(result.data.students);
+      setStudents(result.data.students || []);
     } catch (error) {
       console.log(error);
 
@@ -150,7 +155,9 @@ export default function Students() {
                       className="w-full rounded-lg border border-[#CED4DA] bg-white px-4 py-2.5 text-sm text-[#212529] outline-none transition focus:border-[#495057] focus:ring-2 focus:ring-[#DEE2E6]"
                     >
                       <option value="All">All Status</option>
+
                       <option value="Active">Active</option>
+
                       <option value="Inactive">Inactive</option>
                     </select>
                   </div>
@@ -167,6 +174,7 @@ export default function Students() {
               {/* Student Count */}
               <div className="mt-6 flex items-center gap-2 text-sm text-[#6C757D]">
                 <Users size={17} />
+
                 <span>
                   Showing{" "}
                   <span className="font-semibold text-[#212529]">
@@ -202,7 +210,7 @@ export default function Students() {
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
-                    <table className="w-full min-w-[900px]">
+                    <table className="w-full min-w-[1000px]">
                       <thead className="bg-[#F8F9FA] border-b border-[#DEE2E6]">
                         <tr>
                           <th className="px-5 py-4 text-left text-xs font-semibold uppercase tracking-wide text-[#6C757D]">
@@ -281,6 +289,19 @@ export default function Students() {
                             {/* Actions */}
                             <td className="px-5 py-4">
                               <div className="flex items-center justify-end gap-2">
+                                {/* View */}
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    navigate(`/students/${student._id}`)
+                                  }
+                                  className="inline-flex items-center justify-center rounded-lg border border-[#CED4DA] p-2 text-[#495057] transition hover:bg-[#F8F9FA]"
+                                  title="View Student"
+                                >
+                                  <Eye size={17} />
+                                </button>
+
+                                {/* Edit */}
                                 <button
                                   type="button"
                                   onClick={() =>
@@ -292,6 +313,7 @@ export default function Students() {
                                   <Edit size={17} />
                                 </button>
 
+                                {/* Delete */}
                                 <button
                                   type="button"
                                   onClick={() => handleDelete(student._id)}
