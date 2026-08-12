@@ -10,23 +10,13 @@ export default function MarksReport() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [records, setRecords] = useState([]);
-
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState("");
 
-  // =====================================================
-  // FILTERS
-  // =====================================================
-
   const [department, setDepartment] = useState("All");
-
   const [semester, setSemester] = useState("All");
-
   const [course, setCourse] = useState("All");
-
   const [resultType, setResultType] = useState("All");
-
   const [search, setSearch] = useState("");
 
   // =====================================================
@@ -46,8 +36,6 @@ export default function MarksReport() {
     } catch (err) {
       console.error("Failed to load result report:", err);
 
-      console.error("Backend response:", err?.response?.data);
-
       setError(err?.response?.data?.message || "Failed to load result report.");
     } finally {
       setLoading(false);
@@ -59,7 +47,7 @@ export default function MarksReport() {
   }, []);
 
   // =====================================================
-  // DYNAMIC FILTER OPTIONS
+  // FILTER OPTIONS
   // =====================================================
 
   const departments = useMemo(() => {
@@ -114,21 +102,16 @@ export default function MarksReport() {
 
       const recordResultType = record.resultType || "";
 
-      // Department
       const departmentMatch =
         department === "All" || studentDepartment === department;
 
-      // Semester
       const semesterMatch = semester === "All" || studentSemester === semester;
 
-      // Course
       const courseMatch = course === "All" || recordCourse === course;
 
-      // Result Type
       const resultTypeMatch =
         resultType === "All" || recordResultType === resultType;
 
-      // Search
       const searchMatch =
         !searchValue ||
         studentName.toLowerCase().includes(searchValue) ||
@@ -149,7 +132,7 @@ export default function MarksReport() {
   }, [records, department, semester, course, resultType, search]);
 
   // =====================================================
-  // UNIQUE STUDENTS
+  // SUMMARY
   // =====================================================
 
   const uniqueStudents = useMemo(() => {
@@ -164,20 +147,12 @@ export default function MarksReport() {
     return ids.size;
   }, [filteredRecords]);
 
-  // =====================================================
-  // TOTAL MARKS
-  // =====================================================
-
   const totalMarks = useMemo(() => {
     return filteredRecords.reduce(
       (sum, record) => sum + Number(record.totalMarks || 0),
       0,
     );
   }, [filteredRecords]);
-
-  // =====================================================
-  // TOTAL OBTAINED
-  // =====================================================
 
   const totalObtained = useMemo(() => {
     return filteredRecords.reduce(
@@ -186,43 +161,19 @@ export default function MarksReport() {
     );
   }, [filteredRecords]);
 
-  // =====================================================
-  // AVERAGE
-  // =====================================================
-
   const averagePercentage =
     totalMarks > 0 ? ((totalObtained / totalMarks) * 100).toFixed(1) : "0.0";
 
-  // =====================================================
-  // PASSED
-  // =====================================================
-
-  const passedRecords = filteredRecords.filter((record) => {
-    const percentage = Number(record.percentage);
-
-    return percentage >= 40;
-  });
-
-  const passedCount = passedRecords.length;
-
-  // =====================================================
-  // FAILED
-  // =====================================================
+  const passedCount = filteredRecords.filter(
+    (record) => Number(record.percentage || 0) >= 40,
+  ).length;
 
   const failedCount = filteredRecords.length - passedCount;
-
-  // =====================================================
-  // PASS RATE
-  // =====================================================
 
   const passRate =
     filteredRecords.length > 0
       ? ((passedCount / filteredRecords.length) * 100).toFixed(1)
       : "0.0";
-
-  // =====================================================
-  // HIGHEST
-  // =====================================================
 
   const highestPercentage =
     filteredRecords.length > 0
@@ -230,10 +181,6 @@ export default function MarksReport() {
           ...filteredRecords.map((record) => Number(record.percentage || 0)),
         ).toFixed(1)
       : "0.0";
-
-  // =====================================================
-  // LOWEST
-  // =====================================================
 
   const lowestPercentage =
     filteredRecords.length > 0
@@ -271,7 +218,7 @@ export default function MarksReport() {
   };
 
   // =====================================================
-  // PRINT REPORT
+  // PRINT
   // =====================================================
 
   const handlePrint = () => {
@@ -279,7 +226,7 @@ export default function MarksReport() {
   };
 
   // =====================================================
-  // DATE FORMAT
+  // DATE
   // =====================================================
 
   const formatDate = (date) => {
@@ -293,38 +240,127 @@ export default function MarksReport() {
   };
 
   // =====================================================
-  // RENDER
+  // PAGE
   // =====================================================
 
   return (
-    <div className="min-h-screen bg-slate-50 print:bg-white">
-      {/* =====================================================
-          NAVBAR
-      ====================================================== */}
+    <>
+      {/* ===================================================
+          FIXED NAVBAR
+      ==================================================== */}
 
-      <div className="print:hidden">
+      <div
+        className="
+          fixed
+          left-0
+          right-0
+          top-0
+          z-[100]
+          h-16
+          print:hidden
+        "
+      >
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
-      {/* =====================================================
-          LAYOUT
-      ====================================================== */}
+      {/* ===================================================
+          FIXED SIDEBAR
+      ==================================================== */}
 
-      <div className="flex">
-        {/* SIDEBAR */}
+      <aside
+        className="
+          fixed
+          bottom-0
+          left-0
+          top-16
+          z-[90]
+          hidden
+          w-64
+          overflow-y-auto
+          overflow-x-hidden
+          bg-white
+          print:hidden
+          lg:block
+        "
+      >
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      </aside>
 
-        <div className="print:hidden">
-          <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        </div>
+      {/* ===================================================
+          MOBILE SIDEBAR OVERLAY
+      ==================================================== */}
 
-        {/* CONTENT */}
+      {sidebarOpen && (
+        <div
+          className="
+            fixed
+            inset-0
+            z-[80]
+            bg-slate-900/40
+            lg:hidden
+            print:hidden
+          "
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-        <div className="flex min-h-[calc(100vh-4rem)] min-w-0 flex-1 flex-col">
-          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 print:p-0">
+      {/* ===================================================
+          MOBILE SIDEBAR
+      ==================================================== */}
+
+      <div
+        className={`
+          fixed
+          bottom-0
+          left-0
+          top-16
+          z-[90]
+          w-72
+          overflow-y-auto
+          overflow-x-hidden
+          bg-white
+          shadow-2xl
+          transition-transform
+          duration-300
+          lg:hidden
+          print:hidden
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+        <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+      </div>
+
+      {/* ===================================================
+          PAGE AREA
+
+          Navbar = 64px
+          Sidebar = 256px
+      ==================================================== */}
+
+      <div
+        className="
+          min-h-screen
+          bg-slate-50
+          pt-16
+          print:bg-white
+          print:pt-0
+        "
+      >
+        <div
+          className="
+            min-h-[calc(100vh-4rem)]
+            lg:ml-64
+          "
+        >
+          {/* =================================================
+              MAIN CONTENT
+          ================================================== */}
+
+          <main className="min-w-0 px-4 py-6 sm:px-6 lg:px-8 print:p-0">
             <div className="mx-auto w-full max-w-7xl">
-              {/* =================================================
+              {/* =============================================
                   HEADER
-              ================================================== */}
+              ============================================== */}
 
               <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between print:mb-5">
                 <div>
@@ -363,9 +399,25 @@ export default function MarksReport() {
                 </div>
               </div>
 
-              {/* =================================================
+              {/* =============================================
+                  PRINT HEADER
+              ============================================== */}
+
+              <div className="mb-6 hidden print:block">
+                <div className="border-b-2 border-slate-900 pb-4">
+                  <h2 className="text-2xl font-bold text-slate-900">
+                    Student Result Report
+                  </h2>
+
+                  <p className="mt-1 text-sm text-slate-500">
+                    Generated on {new Date().toLocaleDateString("en-GB")}
+                  </p>
+                </div>
+              </div>
+
+              {/* =============================================
                   ERROR
-              ================================================== */}
+              ============================================== */}
 
               {error && (
                 <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 print:hidden">
@@ -381,25 +433,9 @@ export default function MarksReport() {
                 </div>
               )}
 
-              {/* =================================================
-                  REPORT HEADER FOR PRINT
-              ================================================== */}
-
-              <div className="mb-6 hidden print:block">
-                <div className="border-b-2 border-slate-900 pb-4">
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    Student Result Report
-                  </h2>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Generated on {new Date().toLocaleDateString("en-GB")}
-                  </p>
-                </div>
-              </div>
-
-              {/* =================================================
+              {/* =============================================
                   FILTERS
-              ================================================== */}
+              ============================================== */}
 
               <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
                 <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -409,8 +445,8 @@ export default function MarksReport() {
                     </h2>
 
                     <p className="mt-1 text-xs text-slate-400">
-                      Filter the report by student, department, class, course,
-                      or assessment.
+                      Filter results by student, department, class, course, or
+                      assessment.
                     </p>
                   </div>
 
@@ -434,109 +470,53 @@ export default function MarksReport() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by student name, email, course, result type..."
+                    placeholder="Search student, email, course or result type..."
                     className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                   />
                 </div>
 
-                {/* SELECT FILTERS */}
+                {/* FILTERS */}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-                  {/* DEPARTMENT */}
+                  <FilterSelect
+                    label="Department"
+                    value={department}
+                    onChange={setDepartment}
+                    defaultLabel="All Departments"
+                    options={departments}
+                  />
 
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-slate-600">
-                      Department
-                    </label>
+                  <FilterSelect
+                    label="Semester / Class"
+                    value={semester}
+                    onChange={setSemester}
+                    defaultLabel="All Classes"
+                    options={semesters}
+                  />
 
-                    <select
-                      value={department}
-                      onChange={(e) => setDepartment(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                    >
-                      <option value="All">All Departments</option>
+                  <FilterSelect
+                    label="Course"
+                    value={course}
+                    onChange={setCourse}
+                    defaultLabel="All Courses"
+                    options={courses}
+                  />
 
-                      {departments.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* SEMESTER */}
-
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-slate-600">
-                      Semester / Class
-                    </label>
-
-                    <select
-                      value={semester}
-                      onChange={(e) => setSemester(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                    >
-                      <option value="All">All Classes</option>
-
-                      {semesters.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* COURSE */}
-
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-slate-600">
-                      Course
-                    </label>
-
-                    <select
-                      value={course}
-                      onChange={(e) => setCourse(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                    >
-                      <option value="All">All Courses</option>
-
-                      {courses.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  {/* RESULT TYPE */}
-
-                  <div>
-                    <label className="mb-2 block text-xs font-bold text-slate-600">
-                      Result Type
-                    </label>
-
-                    <select
-                      value={resultType}
-                      onChange={(e) => setResultType(e.target.value)}
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
-                    >
-                      <option value="All">All Assessments</option>
-
-                      {resultTypes.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  <FilterSelect
+                    label="Result Type"
+                    value={resultType}
+                    onChange={setResultType}
+                    defaultLabel="All Assessments"
+                    options={resultTypes}
+                  />
                 </div>
               </section>
 
-              {/* =================================================
-                  ACTIVE FILTER SUMMARY
-              ================================================== */}
+              {/* =============================================
+                  FILTER BADGES
+              ============================================== */}
 
-              <div className="mb-6 flex flex-wrap items-center gap-2 print:mb-4">
+              <div className="mb-6 flex flex-wrap items-center gap-2 print:hidden">
                 {department !== "All" && (
                   <FilterBadge label="Department" value={department} />
                 )}
@@ -566,9 +546,9 @@ export default function MarksReport() {
                   )}
               </div>
 
-              {/* =================================================
+              {/* =============================================
                   SUMMARY CARDS
-              ================================================== */}
+              ============================================== */}
 
               <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <SummaryCard
@@ -602,9 +582,9 @@ export default function MarksReport() {
                 />
               </div>
 
-              {/* =================================================
-                  PERFORMANCE OVERVIEW
-              ================================================== */}
+              {/* =============================================
+                  PERFORMANCE
+              ============================================== */}
 
               <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5 flex items-center justify-between">
@@ -637,9 +617,9 @@ export default function MarksReport() {
                 </div>
               </section>
 
-              {/* =================================================
+              {/* =============================================
                   GRADE DISTRIBUTION
-              ================================================== */}
+              ============================================== */}
 
               <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <div className="mb-5">
@@ -657,7 +637,7 @@ export default function MarksReport() {
                     No grade data available.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10">
                     {[
                       "A+",
                       "A",
@@ -691,13 +671,11 @@ export default function MarksReport() {
                 )}
               </section>
 
-              {/* =================================================
-                  RESULT TABLE
-              ================================================== */}
+              {/* =============================================
+                  DETAILED TABLE
+              ============================================== */}
 
               <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                {/* TABLE HEADER */}
-
                 <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <h2 className="text-sm font-bold text-slate-800">
@@ -715,51 +693,20 @@ export default function MarksReport() {
                   </div>
                 </div>
 
-                {/* TABLE */}
-
                 <div className="overflow-x-auto">
                   <table className="w-full min-w-[1050px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/70">
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          #
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Student
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Department
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Class
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Course
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Assessment
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Marks
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Percentage
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Grade
-                        </th>
-
-                        <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                          Date
-                        </th>
+                        <TableHead>#</TableHead>
+                        <TableHead>Student</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Class</TableHead>
+                        <TableHead>Course</TableHead>
+                        <TableHead>Assessment</TableHead>
+                        <TableHead>Marks</TableHead>
+                        <TableHead>Percentage</TableHead>
+                        <TableHead>Grade</TableHead>
+                        <TableHead>Date</TableHead>
                       </tr>
                     </thead>
 
@@ -794,34 +741,26 @@ export default function MarksReport() {
                         filteredRecords.map((record, index) => {
                           const student = record.student;
 
-                          const percentage = Number(record.percentage);
+                          const percentage = Number(record.percentage || 0);
 
                           return (
                             <tr
                               key={record._id}
                               className="border-b border-slate-100 transition hover:bg-slate-50/70"
                             >
-                              {/* NUMBER */}
-
                               <td className="px-6 py-4 text-xs font-bold text-slate-400">
                                 {index + 1}
                               </td>
 
-                              {/* STUDENT */}
-
                               <td className="px-6 py-4">
-                                <div>
-                                  <p className="text-sm font-bold text-slate-700">
-                                    {student?.name || "Unknown Student"}
-                                  </p>
+                                <p className="text-sm font-bold text-slate-700">
+                                  {student?.name || "Unknown Student"}
+                                </p>
 
-                                  <p className="mt-0.5 text-xs text-slate-400">
-                                    {student?.email || "—"}
-                                  </p>
-                                </div>
+                                <p className="mt-0.5 text-xs text-slate-400">
+                                  {student?.email || "—"}
+                                </p>
                               </td>
-
-                              {/* DEPARTMENT */}
 
                               <td className="px-6 py-4">
                                 <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600">
@@ -829,29 +768,19 @@ export default function MarksReport() {
                                 </span>
                               </td>
 
-                              {/* CLASS */}
-
                               <td className="px-6 py-4 text-sm font-semibold text-slate-600">
                                 {student?.semester || "—"}
                               </td>
 
-                              {/* COURSE */}
-
-                              <td className="px-6 py-4">
-                                <span className="text-sm font-bold text-slate-700">
-                                  {record.course || "—"}
-                                </span>
+                              <td className="px-6 py-4 text-sm font-bold text-slate-700">
+                                {record.course || "—"}
                               </td>
-
-                              {/* RESULT TYPE */}
 
                               <td className="px-6 py-4">
                                 <span className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600">
                                   {record.resultType || "—"}
                                 </span>
                               </td>
-
-                              {/* MARKS */}
 
                               <td className="px-6 py-4">
                                 <span className="text-sm font-bold text-slate-800">
@@ -863,8 +792,6 @@ export default function MarksReport() {
                                   / {record.totalMarks}
                                 </span>
                               </td>
-
-                              {/* PERCENTAGE */}
 
                               <td className="px-6 py-4">
                                 <div className="flex items-center gap-3">
@@ -883,8 +810,6 @@ export default function MarksReport() {
                                 </div>
                               </td>
 
-                              {/* GRADE */}
-
                               <td className="px-6 py-4">
                                 <span
                                   className={`rounded-lg px-3 py-1.5 text-xs font-bold ${
@@ -896,8 +821,6 @@ export default function MarksReport() {
                                   {record.grade || "—"}
                                 </span>
                               </td>
-
-                              {/* DATE */}
 
                               <td className="px-6 py-4 text-xs font-medium text-slate-500">
                                 {formatDate(record.date)}
@@ -913,14 +836,56 @@ export default function MarksReport() {
             </div>
           </main>
 
-          {/* FOOTER */}
+          {/* ===============================================
+              FOOTER
+          ================================================ */}
 
           <div className="print:hidden">
             <Footer />
           </div>
         </div>
       </div>
+    </>
+  );
+}
+
+// =======================================================
+// FILTER SELECT
+// =======================================================
+
+function FilterSelect({ label, value, onChange, defaultLabel, options }) {
+  return (
+    <div>
+      <label className="mb-2 block text-xs font-bold text-slate-600">
+        {label}
+      </label>
+
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+      >
+        <option value="All">{defaultLabel}</option>
+
+        {options.map((item) => (
+          <option key={item} value={item}>
+            {item}
+          </option>
+        ))}
+      </select>
     </div>
+  );
+}
+
+// =======================================================
+// TABLE HEAD
+// =======================================================
+
+function TableHead({ children }) {
+  return (
+    <th className="px-6 py-4 text-left text-[10px] font-bold uppercase tracking-wider text-slate-400">
+      {children}
+    </th>
   );
 }
 
