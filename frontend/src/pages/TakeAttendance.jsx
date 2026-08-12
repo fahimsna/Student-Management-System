@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import Footer from "../components/Footer";
 import { getStudent } from "../api/studentApi";
+
 import {
   CalendarDays,
   Check,
@@ -82,7 +83,7 @@ export default function TakeAttendance() {
 
   /* =========================================================
      SEMESTER / CLASS OPTIONS
-     
+
      Only show options belonging to selected department.
   ========================================================= */
 
@@ -150,7 +151,6 @@ export default function TakeAttendance() {
       setLoadingStudents(true);
 
       const departmentValue = department.trim().toLowerCase();
-
       const semesterValue = semester.trim().toLowerCase();
 
       const filtered = allStudents.filter((student) => {
@@ -224,7 +224,7 @@ export default function TakeAttendance() {
   };
 
   /* =========================================================
-     SAVE
+     SAVE ATTENDANCE
   ========================================================= */
 
   const handleSave = async () => {
@@ -260,17 +260,35 @@ export default function TakeAttendance() {
 
       console.log("Attendance payload:", payload);
 
-      /*
-       * Backend attendance API will be connected here.
-       */
+      const token = localStorage.getItem("token");
 
-      await new Promise((resolve) => setTimeout(resolve, 700));
+      if (!token) {
+        setError("Authentication token not found. Please login again.");
+        return;
+      }
 
-      setSuccess("Attendance prepared successfully.");
+      const response = await fetch("http://localhost:8007/api/attendance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.message || "Failed to save attendance.");
+      }
+
+      setSuccess(result.message || "Attendance saved successfully.");
+
+      setSearch("");
     } catch (err) {
-      console.error(err);
+      console.error("Save attendance error:", err);
 
-      setError(err.response?.data?.message || "Failed to save attendance.");
+      setError(err.message || "Failed to save attendance. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -319,13 +337,11 @@ export default function TakeAttendance() {
   return (
     <div className="flex min-h-screen flex-col bg-[#f8fafc] text-slate-900">
       {/* Navbar */}
-
       <div className="relative z-[100]">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
       {/* Layout */}
-
       <div className="flex min-h-0 flex-1">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 

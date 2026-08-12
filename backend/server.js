@@ -2,7 +2,9 @@ let express = require("express");
 let mongoose = require("mongoose");
 let userRoutes = require("./routes/userRoutes");
 let studentRoutes = require("./routes/studentRoutes");
+let attendanceRoutes = require("./routes/attendanceRoutes");
 let cors = require("cors");
+
 
 require("dotenv").config();
 
@@ -11,6 +13,7 @@ app.use(express.json());
 app.use(cors());
 app.use("/api", userRoutes);
 app.use("/api/students", studentRoutes);
+app.use("/api/attendance", attendanceRoutes);
 mongoose
   .connect(process.env.DBURL)
   .then(() => {

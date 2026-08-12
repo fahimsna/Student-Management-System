@@ -10,6 +10,8 @@ import EditStudent from "./pages/EditStudent";
 import StudentDetails from "./pages/StudentDetails";
 import Profile from "./pages/Profile";
 import TakeAttendance from "./pages/TakeAttendance";
+import AttendanceRecord from "./pages/attendance/AttendanceRecord";
+import AttendanceReport from "./pages/attendance/AttendanceReport";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -17,14 +19,20 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public Home */}
+        {/* =========================
+            PUBLIC ROUTES
+        ========================= */}
+
         <Route path="/" element={<Home />} />
 
-        {/* Authentication */}
         <Route path="/login" element={<Login />} />
+
         <Route path="/register" element={<Register />} />
 
-        {/* Protected Dashboard */}
+        {/* =========================
+            DASHBOARD
+        ========================= */}
+
         <Route
           path="/dashboard"
           element={
@@ -34,7 +42,10 @@ function App() {
           }
         />
 
-        {/* Students */}
+        {/* =========================
+            STUDENTS
+        ========================= */}
+
         <Route
           path="/students"
           element={
@@ -71,7 +82,10 @@ function App() {
           }
         />
 
-        {/* Profile */}
+        {/* =========================
+            PROFILE
+        ========================= */}
+
         <Route
           path="/profile"
           element={
@@ -81,9 +95,41 @@ function App() {
           }
         />
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-        <Route path="/attendance/take" element={<TakeAttendance />} />
+        {/* =========================
+            ATTENDANCE
+        ========================= */}
+
+        <Route
+          path="/attendance/take"
+          element={
+            <ProtectedRoute>
+              <TakeAttendance />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/attendance/records"
+          element={
+            <ProtectedRoute>
+              <AttendanceRecord />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/attendance/report"
+          element={
+            <ProtectedRoute>
+              <AttendanceReport />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* =========================
+            FALLBACK
+        ========================= */}
+
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
