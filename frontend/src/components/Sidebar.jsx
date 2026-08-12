@@ -1,6 +1,5 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, UserPlus, UserCircle } from "lucide-react";
 import Logout from "../pages/Logout";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -14,6 +13,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         ></div>
       )}
 
+      {/* Sidebar */}
       <aside
         className={`
           fixed md:static
@@ -41,15 +41,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             to="/dashboard"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
+              `block px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            <LayoutDashboard size={19} />
-            <span>Dashboard</span>
+            Dashboard
           </NavLink>
 
           {/* Students */}
@@ -57,15 +56,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             to="/students"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
+              `block px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            <Users size={19} />
-            <span>Students</span>
+            Students
           </NavLink>
 
           {/* Add Student */}
@@ -73,15 +71,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             to="/add-student"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
+              `block px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            <UserPlus size={19} />
-            <span>Add Student</span>
+            Add Student
           </NavLink>
 
           {/* Profile */}
@@ -89,15 +86,14 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             to="/profile"
             onClick={() => setSidebarOpen(false)}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-4 py-3 rounded-md transition duration-200 ${
+              `block px-4 py-3 rounded-md transition duration-200 ${
                 isActive
                   ? "bg-[#343A40] text-white"
                   : "text-[#CED4DA] hover:bg-[#343A40] hover:text-white"
               }`
             }
           >
-            <UserCircle size={19} />
-            <span>Profile</span>
+            Profile
           </NavLink>
         </div>
 
