@@ -1,34 +1,28 @@
 const express = require("express");
 
+const router = express.Router();
+
 const {
   createMarks,
   getMarks,
   getStudentMarks,
+  updateMarks,
+  deleteMarks,
 } = require("../controllers/markController");
 
-const authMiddleware = require("../middleware/authMiddleware");
+// Add marks
+router.post("/addMarks", createMarks);
 
-const router = express.Router();
+// Get all marks
+router.get("/getMarks", getMarks);
 
-// =====================================================
-// ADD MARKS
-// POST /api/marks/addMarks
-// =====================================================
+// Get marks for one student
+router.get("/student/:studentId", getStudentMarks);
 
-router.post("/addMarks", authMiddleware, createMarks);
+// Update marks
+router.put("/updateMarks/:id", updateMarks);
 
-// =====================================================
-// GET ALL MARKS
-// GET /api/marks/getMarks
-// =====================================================
-
-router.get("/getMarks", authMiddleware, getMarks);
-
-// =====================================================
-// GET MARKS FOR ONE STUDENT
-// GET /api/marks/student/:studentId
-// =====================================================
-
-router.get("/student/:studentId", authMiddleware, getStudentMarks);
+// Delete marks
+router.delete("/deleteMarks/:id", deleteMarks);
 
 module.exports = router;

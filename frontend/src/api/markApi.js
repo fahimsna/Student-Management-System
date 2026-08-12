@@ -11,3 +11,11 @@ export const getMarks = () => {
 export const getStudentMarks = (studentId) => {
   return axiosInstance.get(`/marks/student/${studentId}`);
 };
+
+export const updateMarks = (id, data) => {
+  return axiosInstance.put(`/marks/updateMarks/${id}`, data);
+};
+
+export const deleteMarks = (id) => {
+  return axiosInstance.delete(`/marks/deleteMarks/${id}`);
+};

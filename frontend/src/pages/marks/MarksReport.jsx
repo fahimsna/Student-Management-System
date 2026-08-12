@@ -4,7 +4,7 @@ import Navbar from "../../components/Navbar";
 import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 
-import { getMarks } from "../../api/markApi";
+import { getMarks, updateMarks, deleteMarks } from "../../api/markApi";
 
 export default function MarksReport() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -13,11 +13,38 @@ export default function MarksReport() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // =====================================================
+  // FILTERS
+  // =====================================================
+
+  const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("All");
   const [semester, setSemester] = useState("All");
   const [course, setCourse] = useState("All");
   const [resultType, setResultType] = useState("All");
-  const [search, setSearch] = useState("");
+
+  // =====================================================
+  // EDIT
+  // =====================================================
+
+  const [editingRecord, setEditingRecord] = useState(null);
+
+  const [editForm, setEditForm] = useState({
+    course: "",
+    resultType: "",
+    totalMarks: "",
+    obtainedMarks: "",
+    date: "",
+  });
+
+  const [savingEdit, setSavingEdit] = useState(false);
+
+  // =====================================================
+  // DELETE
+  // =====================================================
+
+  const [deletingId, setDeletingId] = useState(null);
+  const [deleting, setDeleting] = useState(false);
 
   // =====================================================
   // LOAD MARKS
@@ -30,13 +57,13 @@ export default function MarksReport() {
 
       const response = await getMarks();
 
-      console.log("Result report marks:", response.data);
+      console.log("Marks report response:", response.data);
 
       setRecords(response?.data?.marks || []);
     } catch (err) {
-      console.error("Failed to load result report:", err);
+      console.error("Get marks error:", err);
 
-      setError(err?.response?.data?.message || "Failed to load result report.");
+      setError(err?.response?.data?.message || "Failed to load marks report.");
     } finally {
       setLoading(false);
     }
@@ -53,16 +80,14 @@ export default function MarksReport() {
   const departments = useMemo(() => {
     return [
       ...new Set(
-        records.map((record) => record.student?.department).filter(Boolean),
+        records.map((item) => item.student?.department).filter(Boolean),
       ),
     ].sort();
   }, [records]);
 
   const semesters = useMemo(() => {
     return [
-      ...new Set(
-        records.map((record) => record.student?.semester).filter(Boolean),
-      ),
+      ...new Set(records.map((item) => item.student?.semester).filter(Boolean)),
     ].sort((a, b) =>
       String(a).localeCompare(String(b), undefined, {
         numeric: true,
@@ -72,22 +97,22 @@ export default function MarksReport() {
 
   const courses = useMemo(() => {
     return [
-      ...new Set(records.map((record) => record.course).filter(Boolean)),
+      ...new Set(records.map((item) => item.course).filter(Boolean)),
     ].sort();
   }, [records]);
 
   const resultTypes = useMemo(() => {
     return [
-      ...new Set(records.map((record) => record.resultType).filter(Boolean)),
+      ...new Set(records.map((item) => item.resultType).filter(Boolean)),
     ].sort();
   }, [records]);
 
   // =====================================================
-  // FILTER RECORDS
+  // FILTER
   // =====================================================
 
   const filteredRecords = useMemo(() => {
-    const searchValue = search.trim().toLowerCase();
+    const keyword = search.trim().toLowerCase();
 
     return records.filter((record) => {
       const studentName = record.student?.name || "";
@@ -113,13 +138,13 @@ export default function MarksReport() {
         resultType === "All" || recordResultType === resultType;
 
       const searchMatch =
-        !searchValue ||
-        studentName.toLowerCase().includes(searchValue) ||
-        studentEmail.toLowerCase().includes(searchValue) ||
-        studentDepartment.toLowerCase().includes(searchValue) ||
-        studentSemester.toLowerCase().includes(searchValue) ||
-        recordCourse.toLowerCase().includes(searchValue) ||
-        recordResultType.toLowerCase().includes(searchValue);
+        !keyword ||
+        studentName.toLowerCase().includes(keyword) ||
+        studentEmail.toLowerCase().includes(keyword) ||
+        studentDepartment.toLowerCase().includes(keyword) ||
+        studentSemester.toLowerCase().includes(keyword) ||
+        recordCourse.toLowerCase().includes(keyword) ||
+        recordResultType.toLowerCase().includes(keyword);
 
       return (
         departmentMatch &&
@@ -129,22 +154,22 @@ export default function MarksReport() {
         searchMatch
       );
     });
-  }, [records, department, semester, course, resultType, search]);
+  }, [records, search, department, semester, course, resultType]);
 
   // =====================================================
   // SUMMARY
   // =====================================================
 
   const uniqueStudents = useMemo(() => {
-    const ids = new Set();
+    const studentIds = new Set();
 
     filteredRecords.forEach((record) => {
       if (record.student?._id) {
-        ids.add(record.student._id);
+        studentIds.add(record.student._id);
       }
     });
 
-    return ids.size;
+    return studentIds.size;
   }, [filteredRecords]);
 
   const totalMarks = useMemo(() => {
@@ -175,46 +200,36 @@ export default function MarksReport() {
       ? ((passedCount / filteredRecords.length) * 100).toFixed(1)
       : "0.0";
 
-  const highestPercentage =
-    filteredRecords.length > 0
-      ? Math.max(
-          ...filteredRecords.map((record) => Number(record.percentage || 0)),
-        ).toFixed(1)
-      : "0.0";
-
-  const lowestPercentage =
-    filteredRecords.length > 0
-      ? Math.min(
-          ...filteredRecords.map((record) => Number(record.percentage || 0)),
-        ).toFixed(1)
-      : "0.0";
-
-  // =====================================================
-  // GRADE COUNTS
-  // =====================================================
-
-  const gradeCounts = useMemo(() => {
-    const counts = {};
-
-    filteredRecords.forEach((record) => {
-      const grade = record.grade || "N/A";
-
-      counts[grade] = (counts[grade] || 0) + 1;
-    });
-
-    return counts;
-  }, [filteredRecords]);
-
   // =====================================================
   // CLEAR FILTERS
   // =====================================================
 
   const clearFilters = () => {
+    setSearch("");
     setDepartment("All");
     setSemester("All");
     setCourse("All");
     setResultType("All");
-    setSearch("");
+  };
+
+  // =====================================================
+  // DATE
+  // =====================================================
+
+  const formatDate = (date) => {
+    if (!date) return "—";
+
+    const parsedDate = new Date(date);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "—";
+    }
+
+    return parsedDate.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
   };
 
   // =====================================================
@@ -226,17 +241,208 @@ export default function MarksReport() {
   };
 
   // =====================================================
-  // DATE
+  // EDIT
   // =====================================================
 
-  const formatDate = (date) => {
-    if (!date) return "—";
+  const openEditModal = (record) => {
+    setEditingRecord(record);
 
-    return new Date(date).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
+    setEditForm({
+      course: record.course || "",
+      resultType: record.resultType || "",
+      totalMarks: record.totalMarks ?? "",
+      obtainedMarks: record.obtainedMarks ?? "",
+      date: record.date ? String(record.date).slice(0, 10) : "",
     });
+  };
+
+  const closeEditModal = () => {
+    if (savingEdit) return;
+
+    setEditingRecord(null);
+
+    setEditForm({
+      course: "",
+      resultType: "",
+      totalMarks: "",
+      obtainedMarks: "",
+      date: "",
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  // =====================================================
+  // EDIT CALCULATIONS
+  // =====================================================
+
+  const editTotal = Number(editForm.totalMarks || 0);
+
+  const editObtained = Number(editForm.obtainedMarks || 0);
+
+  const editPercentage = editTotal > 0 ? (editObtained / editTotal) * 100 : 0;
+
+  const calculateGrade = (percentage) => {
+    if (percentage >= 80) return "A+";
+    if (percentage >= 75) return "A";
+    if (percentage >= 70) return "A-";
+    if (percentage >= 65) return "B+";
+    if (percentage >= 60) return "B";
+    if (percentage >= 55) return "B-";
+    if (percentage >= 50) return "C+";
+    if (percentage >= 45) return "C";
+    if (percentage >= 40) return "D";
+
+    return "F";
+  };
+
+  const editGrade = calculateGrade(editPercentage);
+
+  // =====================================================
+  // UPDATE
+  // =====================================================
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+
+    if (!editingRecord?._id) {
+      return;
+    }
+
+    if (!editForm.course.trim()) {
+      alert("Course is required.");
+      return;
+    }
+
+    if (!editForm.resultType.trim()) {
+      alert("Result type is required.");
+      return;
+    }
+
+    if (!editForm.date) {
+      alert("Date is required.");
+      return;
+    }
+
+    if (editTotal <= 0) {
+      alert("Total marks must be greater than 0.");
+      return;
+    }
+
+    if (editObtained < 0) {
+      alert("Obtained marks cannot be negative.");
+      return;
+    }
+
+    if (editObtained > editTotal) {
+      alert("Obtained marks cannot be greater than total marks.");
+      return;
+    }
+
+    try {
+      setSavingEdit(true);
+
+      const payload = {
+        studentId: editingRecord.student?._id || editingRecord.student,
+
+        course: editForm.course.trim(),
+
+        resultType: editForm.resultType.trim(),
+
+        totalMarks: editTotal,
+
+        obtainedMarks: editObtained,
+
+        date: editForm.date,
+      };
+
+      console.log("Updating marks:", payload);
+
+      const response = await updateMarks(editingRecord._id, payload);
+
+      console.log("Update response:", response.data);
+
+      const updatedMarks = response?.data?.marks;
+
+      if (!updatedMarks) {
+        throw new Error("Updated marks were not returned by server.");
+      }
+
+      setRecords((prev) =>
+        prev.map((record) =>
+          record._id === editingRecord._id
+            ? {
+                ...record,
+                ...updatedMarks,
+                student: updatedMarks.student || record.student,
+              }
+            : record,
+        ),
+      );
+
+      closeEditModal();
+
+      alert("Marks updated successfully.");
+    } catch (err) {
+      console.error("Update marks error:", err);
+
+      alert(
+        err?.response?.data?.message ||
+          err.message ||
+          "Failed to update marks.",
+      );
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  // =====================================================
+  // DELETE
+  // =====================================================
+
+  const openDeleteConfirm = (id) => {
+    setDeletingId(id);
+  };
+
+  const closeDeleteConfirm = () => {
+    if (deleting) return;
+
+    setDeletingId(null);
+  };
+
+  const handleDelete = async () => {
+    if (!deletingId) return;
+
+    try {
+      setDeleting(true);
+
+      console.log("Deleting marks:", deletingId);
+
+      const response = await deleteMarks(deletingId);
+
+      console.log("Delete response:", response.data);
+
+      // Remove from frontend AFTER
+      // successful database deletion.
+      setRecords((prev) => prev.filter((record) => record._id !== deletingId));
+
+      setDeletingId(null);
+
+      alert("Marks deleted successfully.");
+    } catch (err) {
+      console.error("Delete marks error:", err);
+
+      alert(err?.response?.data?.message || "Failed to delete marks.");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   // =====================================================
@@ -245,68 +451,36 @@ export default function MarksReport() {
 
   return (
     <>
-      {/* ===================================================
-          FIXED NAVBAR
-      ==================================================== */}
+      {/* =================================================
+          NAVBAR
+      ================================================= */}
 
-      <div
-        className="
-          fixed
-          left-0
-          right-0
-          top-0
-          z-[100]
-          h-16
-          print:hidden
-        "
-      >
+      <div className="fixed left-0 right-0 top-0 z-[100] h-16 print:hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
-      {/* ===================================================
-          FIXED SIDEBAR
-      ==================================================== */}
+      {/* =================================================
+          DESKTOP SIDEBAR
+      ================================================= */}
 
-      <aside
-        className="
-          fixed
-          bottom-0
-          left-0
-          top-16
-          z-[90]
-          hidden
-          w-64
-          overflow-y-auto
-          overflow-x-hidden
-          bg-white
-          print:hidden
-          lg:block
-        "
-      >
+      <aside className="fixed bottom-0 left-0 top-16 z-[90] hidden w-64 overflow-y-auto overflow-x-hidden bg-white lg:block print:hidden">
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </aside>
 
-      {/* ===================================================
-          MOBILE SIDEBAR OVERLAY
-      ==================================================== */}
+      {/* =================================================
+          MOBILE OVERLAY
+      ================================================= */}
 
       {sidebarOpen && (
         <div
-          className="
-            fixed
-            inset-0
-            z-[80]
-            bg-slate-900/40
-            lg:hidden
-            print:hidden
-          "
+          className="fixed inset-0 z-[80] bg-slate-900/40 lg:hidden print:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      {/* ===================================================
+      {/* =================================================
           MOBILE SIDEBAR
-      ==================================================== */}
+      ================================================= */}
 
       <div
         className={`
@@ -330,41 +504,19 @@ export default function MarksReport() {
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
 
-      {/* ===================================================
-          PAGE AREA
+      {/* =================================================
+          MAIN PAGE
+      ================================================= */}
 
-          Navbar = 64px
-          Sidebar = 256px
-      ==================================================== */}
-
-      <div
-        className="
-          min-h-screen
-          bg-slate-50
-          pt-16
-          print:bg-white
-          print:pt-0
-        "
-      >
-        <div
-          className="
-            min-h-[calc(100vh-4rem)]
-            lg:ml-64
-          "
-        >
-          {/* =================================================
-              MAIN CONTENT
-          ================================================== */}
-
+      <div className="min-h-screen bg-slate-50 pt-16 print:bg-white print:pt-0">
+        <div className="min-h-[calc(100vh-4rem)] lg:ml-64">
           <main className="min-w-0 px-4 py-6 sm:px-6 lg:px-8 print:p-0">
             <div className="mx-auto w-full max-w-7xl">
-              {/* =============================================
-                  HEADER
-              ============================================== */}
+              {/* HEADER */}
 
               <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-end md:justify-between print:mb-5">
                 <div>
-                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600 print:text-black">
+                  <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
                     Marks & Results
                   </p>
 
@@ -373,8 +525,7 @@ export default function MarksReport() {
                   </h1>
 
                   <p className="mt-2 max-w-2xl text-sm text-slate-500">
-                    Analyze student performance across courses, assessments,
-                    classes, and departments.
+                    View and manage student assessment results.
                   </p>
                 </div>
 
@@ -392,68 +543,43 @@ export default function MarksReport() {
                     type="button"
                     onClick={handlePrint}
                     disabled={filteredRecords.length === 0}
-                    className="h-11 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="h-11 rounded-xl bg-blue-600 px-5 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 disabled:opacity-50"
                   >
-                    🖨 Print Report
+                    🖨 Print
                   </button>
                 </div>
               </div>
 
-              {/* =============================================
-                  PRINT HEADER
-              ============================================== */}
-
-              <div className="mb-6 hidden print:block">
-                <div className="border-b-2 border-slate-900 pb-4">
-                  <h2 className="text-2xl font-bold text-slate-900">
-                    Student Result Report
-                  </h2>
-
-                  <p className="mt-1 text-sm text-slate-500">
-                    Generated on {new Date().toLocaleDateString("en-GB")}
-                  </p>
-                </div>
-              </div>
-
-              {/* =============================================
-                  ERROR
-              ============================================== */}
+              {/* ERROR */}
 
               {error && (
-                <div className="mb-6 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3 print:hidden">
-                  <span>⚠️</span>
+                <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-sm font-bold text-red-700">Error</p>
 
-                  <div>
-                    <p className="text-sm font-bold text-red-700">
-                      Unable to load report
-                    </p>
-
-                    <p className="mt-1 text-xs text-red-500">{error}</p>
-                  </div>
+                  <p className="mt-1 text-xs text-red-500">{error}</p>
                 </div>
               )}
 
-              {/* =============================================
+              {/* =================================================
                   FILTERS
-              ============================================== */}
+              ================================================= */}
 
               <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm print:hidden">
-                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mb-5 flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-bold text-slate-800">
                       Report Filters
                     </h2>
 
                     <p className="mt-1 text-xs text-slate-400">
-                      Filter results by student, department, class, course, or
-                      assessment.
+                      Filter result records.
                     </p>
                   </div>
 
                   <button
                     type="button"
                     onClick={clearFilters}
-                    className="text-xs font-bold text-blue-600 transition hover:text-blue-700"
+                    className="text-xs font-bold text-blue-600 hover:text-blue-700"
                   >
                     Clear Filters
                   </button>
@@ -470,12 +596,10 @@ export default function MarksReport() {
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search student, email, course or result type..."
-                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                    placeholder="Search student, email, course..."
+                    className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                   />
                 </div>
-
-                {/* FILTERS */}
 
                 <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
                   <FilterSelect
@@ -487,7 +611,7 @@ export default function MarksReport() {
                   />
 
                   <FilterSelect
-                    label="Semester / Class"
+                    label="Class / Semester"
                     value={semester}
                     onChange={setSemester}
                     defaultLabel="All Classes"
@@ -503,7 +627,7 @@ export default function MarksReport() {
                   />
 
                   <FilterSelect
-                    label="Result Type"
+                    label="Assessment"
                     value={resultType}
                     onChange={setResultType}
                     defaultLabel="All Assessments"
@@ -512,43 +636,9 @@ export default function MarksReport() {
                 </div>
               </section>
 
-              {/* =============================================
-                  FILTER BADGES
-              ============================================== */}
-
-              <div className="mb-6 flex flex-wrap items-center gap-2 print:hidden">
-                {department !== "All" && (
-                  <FilterBadge label="Department" value={department} />
-                )}
-
-                {semester !== "All" && (
-                  <FilterBadge label="Class" value={semester} />
-                )}
-
-                {course !== "All" && (
-                  <FilterBadge label="Course" value={course} />
-                )}
-
-                {resultType !== "All" && (
-                  <FilterBadge label="Assessment" value={resultType} />
-                )}
-
-                {search && <FilterBadge label="Search" value={search} />}
-
-                {department === "All" &&
-                  semester === "All" &&
-                  course === "All" &&
-                  resultType === "All" &&
-                  !search && (
-                    <span className="text-xs text-slate-400">
-                      Showing all result records
-                    </span>
-                  )}
-              </div>
-
-              {/* =============================================
-                  SUMMARY CARDS
-              ============================================== */}
+              {/* =================================================
+                  SUMMARY
+              ================================================= */}
 
               <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 <SummaryCard
@@ -582,166 +672,83 @@ export default function MarksReport() {
                 />
               </div>
 
-              {/* =============================================
-                  PERFORMANCE
-              ============================================== */}
-
-              <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-5 flex items-center justify-between">
-                  <div>
-                    <h2 className="text-sm font-bold text-slate-800">
-                      Performance Overview
-                    </h2>
-
-                    <p className="mt-1 text-xs text-slate-400">
-                      Summary of the selected result records.
-                    </p>
-                  </div>
-
-                  <span className="rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-bold text-blue-600">
-                    {filteredRecords.length} Records
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                  <OverviewItem
-                    label="Highest"
-                    value={`${highestPercentage}%`}
-                  />
-
-                  <OverviewItem label="Lowest" value={`${lowestPercentage}%`} />
-
-                  <OverviewItem label="Total Obtained" value={totalObtained} />
-
-                  <OverviewItem label="Total Marks" value={totalMarks} />
-                </div>
-              </section>
-
-              {/* =============================================
-                  GRADE DISTRIBUTION
-              ============================================== */}
-
-              <section className="mb-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <div className="mb-5">
-                  <h2 className="text-sm font-bold text-slate-800">
-                    Grade Distribution
-                  </h2>
-
-                  <p className="mt-1 text-xs text-slate-400">
-                    Number of result records by grade.
-                  </p>
-                </div>
-
-                {filteredRecords.length === 0 ? (
-                  <div className="rounded-xl bg-slate-50 py-8 text-center text-sm text-slate-400">
-                    No grade data available.
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-10">
-                    {[
-                      "A+",
-                      "A",
-                      "A-",
-                      "B+",
-                      "B",
-                      "B-",
-                      "C+",
-                      "C",
-                      "D",
-                      "F",
-                    ].map((grade) => (
-                      <div
-                        key={grade}
-                        className="rounded-xl border border-slate-100 bg-slate-50 p-4 text-center"
-                      >
-                        <p className="text-lg font-black text-slate-800">
-                          {grade}
-                        </p>
-
-                        <p className="mt-1 text-xl font-bold text-blue-600">
-                          {gradeCounts[grade] || 0}
-                        </p>
-
-                        <p className="text-[10px] font-medium text-slate-400">
-                          Records
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
-
-              {/* =============================================
-                  DETAILED TABLE
-              ============================================== */}
+              {/* =================================================
+                  TABLE
+              ================================================= */}
 
               <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-                <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
                   <div>
                     <h2 className="text-sm font-bold text-slate-800">
                       Detailed Result Report
                     </h2>
 
                     <p className="mt-1 text-xs text-slate-400">
-                      Individual student assessment results.
+                      Individual assessment results.
                     </p>
                   </div>
 
-                  <div className="text-xs font-semibold text-slate-400">
-                    {filteredRecords.length} result
-                    {filteredRecords.length !== 1 ? "s" : ""}
-                  </div>
+                  <span className="text-xs font-semibold text-slate-400">
+                    {filteredRecords.length} results
+                  </span>
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[1050px]">
+                  <table className="w-full min-w-[1200px]">
                     <thead>
                       <tr className="border-b border-slate-100 bg-slate-50/70">
                         <TableHead>#</TableHead>
+
                         <TableHead>Student</TableHead>
+
                         <TableHead>Department</TableHead>
+
                         <TableHead>Class</TableHead>
+
                         <TableHead>Course</TableHead>
+
                         <TableHead>Assessment</TableHead>
+
                         <TableHead>Marks</TableHead>
+
                         <TableHead>Percentage</TableHead>
+
                         <TableHead>Grade</TableHead>
+
                         <TableHead>Date</TableHead>
+
+                        <TableHead>Actions</TableHead>
                       </tr>
                     </thead>
 
                     <tbody>
                       {loading ? (
                         <tr>
-                          <td colSpan="10" className="px-6 py-16 text-center">
+                          <td colSpan="11" className="px-6 py-16 text-center">
                             <div className="mx-auto h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-blue-600" />
 
-                            <p className="mt-4 text-sm font-medium text-slate-500">
-                              Loading result report...
+                            <p className="mt-4 text-sm text-slate-500">
+                              Loading results...
                             </p>
                           </td>
                         </tr>
                       ) : filteredRecords.length === 0 ? (
                         <tr>
-                          <td colSpan="10" className="px-6 py-16 text-center">
-                            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-slate-100 text-xl text-slate-400">
-                              📊
-                            </div>
+                          <td colSpan="11" className="px-6 py-16 text-center">
+                            <p className="text-sm font-semibold text-slate-500">
+                              No result records found.
+                            </p>
 
-                            <h3 className="mt-4 text-sm font-bold text-slate-700">
-                              No result records
-                            </h3>
-
-                            <p className="mx-auto mt-1 max-w-sm text-xs leading-5 text-slate-400">
-                              No marks match the selected filters.
+                            <p className="mt-1 text-xs text-slate-400">
+                              Try changing your filters.
                             </p>
                           </td>
                         </tr>
                       ) : (
                         filteredRecords.map((record, index) => {
-                          const student = record.student;
-
                           const percentage = Number(record.percentage || 0);
+
+                          const isFailed = percentage < 40;
 
                           return (
                             <tr
@@ -754,22 +761,20 @@ export default function MarksReport() {
 
                               <td className="px-6 py-4">
                                 <p className="text-sm font-bold text-slate-700">
-                                  {student?.name || "Unknown Student"}
+                                  {record.student?.name || "Unknown Student"}
                                 </p>
 
                                 <p className="mt-0.5 text-xs text-slate-400">
-                                  {student?.email || "—"}
+                                  {record.student?.email || "—"}
                                 </p>
                               </td>
 
-                              <td className="px-6 py-4">
-                                <span className="rounded-lg bg-slate-100 px-2.5 py-1.5 text-xs font-semibold text-slate-600">
-                                  {student?.department || "—"}
-                                </span>
+                              <td className="px-6 py-4 text-xs font-semibold text-slate-600">
+                                {record.student?.department || "—"}
                               </td>
 
                               <td className="px-6 py-4 text-sm font-semibold text-slate-600">
-                                {student?.semester || "—"}
+                                {record.student?.semester || "—"}
                               </td>
 
                               <td className="px-6 py-4 text-sm font-bold text-slate-700">
@@ -787,33 +792,20 @@ export default function MarksReport() {
                                   {record.obtainedMarks}
                                 </span>
 
-                                <span className="text-xs font-medium text-slate-400">
+                                <span className="text-xs text-slate-400">
                                   {" "}
                                   / {record.totalMarks}
                                 </span>
                               </td>
 
-                              <td className="px-6 py-4">
-                                <div className="flex items-center gap-3">
-                                  <span className="text-sm font-bold text-slate-700">
-                                    {percentage.toFixed(1)}%
-                                  </span>
-
-                                  <div className="hidden h-1.5 w-16 overflow-hidden rounded-full bg-slate-100 lg:block">
-                                    <div
-                                      className="h-full rounded-full bg-blue-600"
-                                      style={{
-                                        width: `${Math.min(percentage, 100)}%`,
-                                      }}
-                                    />
-                                  </div>
-                                </div>
+                              <td className="px-6 py-4 text-sm font-bold text-slate-700">
+                                {percentage.toFixed(1)}%
                               </td>
 
                               <td className="px-6 py-4">
                                 <span
                                   className={`rounded-lg px-3 py-1.5 text-xs font-bold ${
-                                    record.grade === "F"
+                                    isFailed
                                       ? "bg-red-50 text-red-600"
                                       : "bg-emerald-50 text-emerald-600"
                                   }`}
@@ -824,6 +816,30 @@ export default function MarksReport() {
 
                               <td className="px-6 py-4 text-xs font-medium text-slate-500">
                                 {formatDate(record.date)}
+                              </td>
+
+                              {/* ACTIONS */}
+
+                              <td className="px-6 py-4">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    type="button"
+                                    onClick={() => openEditModal(record)}
+                                    className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-600 transition hover:bg-blue-100"
+                                  >
+                                    ✏️ Edit
+                                  </button>
+
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      openDeleteConfirm(record._id)
+                                    }
+                                    className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-xs font-bold text-red-600 transition hover:bg-red-100"
+                                  >
+                                    🗑 Delete
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           );
@@ -836,15 +852,225 @@ export default function MarksReport() {
             </div>
           </main>
 
-          {/* ===============================================
-              FOOTER
-          ================================================ */}
-
           <div className="print:hidden">
             <Footer />
           </div>
         </div>
       </div>
+
+      {/* =====================================================
+          EDIT MODAL
+      ===================================================== */}
+
+      {editingRecord && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-slate-950/60 p-4">
+          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-white shadow-2xl">
+            {/* HEADER */}
+
+            <div className="flex items-center justify-between border-b border-slate-100 px-6 py-5">
+              <div>
+                <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-blue-600">
+                  Edit Result
+                </p>
+
+                <h2 className="mt-1 text-xl font-bold text-slate-900">
+                  Update Marks
+                </h2>
+              </div>
+
+              <button
+                type="button"
+                onClick={closeEditModal}
+                disabled={savingEdit}
+                className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-100 text-slate-500 hover:bg-slate-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* STUDENT */}
+
+            <div className="mx-6 mt-6 rounded-xl bg-slate-50 p-4">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Student
+              </p>
+
+              <p className="mt-1 text-sm font-bold text-slate-800">
+                {editingRecord.student?.name || "Unknown Student"}
+              </p>
+
+              <p className="mt-1 text-xs text-slate-500">
+                {editingRecord.student?.department || "—"} •{" "}
+                {editingRecord.student?.semester || "—"}
+              </p>
+            </div>
+
+            {/* FORM */}
+
+            <form onSubmit={handleUpdate} className="space-y-5 p-6">
+              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <FormInput
+                  label="Course"
+                  name="course"
+                  value={editForm.course}
+                  onChange={handleEditChange}
+                  placeholder="e.g. Bangla"
+                  required
+                />
+
+                <FormInput
+                  label="Result Type"
+                  name="resultType"
+                  value={editForm.resultType}
+                  onChange={handleEditChange}
+                  placeholder="e.g. Quiz 1"
+                  required
+                />
+
+                <FormInput
+                  label="Total Marks"
+                  name="totalMarks"
+                  type="number"
+                  value={editForm.totalMarks}
+                  onChange={handleEditChange}
+                  min="1"
+                  required
+                />
+
+                <FormInput
+                  label="Obtained Marks"
+                  name="obtainedMarks"
+                  type="number"
+                  value={editForm.obtainedMarks}
+                  onChange={handleEditChange}
+                  min="0"
+                  max={editForm.totalMarks || undefined}
+                  required
+                />
+
+                <FormInput
+                  label="Date"
+                  name="date"
+                  type="date"
+                  value={editForm.date}
+                  onChange={handleEditChange}
+                  required
+                />
+              </div>
+
+              {/* PREVIEW */}
+
+              <div className="rounded-xl border border-blue-100 bg-blue-50 p-5">
+                <p className="mb-4 text-xs font-bold uppercase tracking-wider text-blue-600">
+                  Result Preview
+                </p>
+
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400">
+                      PERCENTAGE
+                    </p>
+
+                    <p className="mt-1 text-xl font-black text-slate-800">
+                      {editPercentage.toFixed(2)}%
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400">
+                      GRADE
+                    </p>
+
+                    <p className="mt-1 text-xl font-black text-blue-600">
+                      {editGrade}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-[10px] font-bold text-slate-400">
+                      STATUS
+                    </p>
+
+                    <p
+                      className={`mt-1 text-xl font-black ${
+                        editPercentage >= 40
+                          ? "text-emerald-600"
+                          : "text-red-600"
+                      }`}
+                    >
+                      {editPercentage >= 40 ? "PASS" : "FAIL"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* BUTTONS */}
+
+              <div className="flex justify-end gap-3 border-t border-slate-100 pt-5">
+                <button
+                  type="button"
+                  onClick={closeEditModal}
+                  disabled={savingEdit}
+                  className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="rounded-xl bg-blue-600 px-6 py-3 text-sm font-bold text-white hover:bg-blue-700 disabled:opacity-60"
+                >
+                  {savingEdit ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* =====================================================
+          DELETE CONFIRMATION
+      ===================================================== */}
+
+      {deletingId && (
+        <div className="fixed inset-0 z-[210] flex items-center justify-center bg-slate-950/60 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-50 text-xl">
+              🗑️
+            </div>
+
+            <h2 className="mt-5 text-xl font-bold text-slate-900">
+              Delete Result?
+            </h2>
+
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              This result will be permanently deleted from the database. This
+              action cannot be undone.
+            </p>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={closeDeleteConfirm}
+                disabled={deleting}
+                className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="rounded-xl bg-red-600 px-5 py-3 text-sm font-bold text-white hover:bg-red-700 disabled:opacity-60"
+              >
+                {deleting ? "Deleting..." : "Yes, Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
@@ -867,12 +1093,48 @@ function FilterSelect({ label, value, onChange, defaultLabel, options }) {
       >
         <option value="All">{defaultLabel}</option>
 
-        {options.map((item) => (
-          <option key={item} value={item}>
-            {item}
+        {options.map((option) => (
+          <option key={option} value={option}>
+            {option}
           </option>
         ))}
       </select>
+    </div>
+  );
+}
+
+// =======================================================
+// FORM INPUT
+// =======================================================
+
+function FormInput({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  placeholder,
+  min,
+  max,
+  required = false,
+}) {
+  return (
+    <div>
+      <label className="mb-2 block text-xs font-bold text-slate-600">
+        {label}
+      </label>
+
+      <input
+        type={type}
+        name={name}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        min={min}
+        max={max}
+        required={required}
+        className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+      />
     </div>
   );
 }
@@ -919,51 +1181,13 @@ function SummaryCard({
             {value}
           </p>
 
-          <p className="mt-1 text-[11px] font-medium text-slate-400">
-            {description}
-          </p>
+          <p className="mt-1 text-[11px] text-slate-400">{description}</p>
         </div>
 
-        <div
-          className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm ${
-            danger
-              ? "bg-red-50 text-red-600"
-              : positive
-                ? "bg-emerald-50 text-emerald-600"
-                : "bg-blue-50 text-blue-600"
-          }`}
-        >
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-sm text-blue-600">
           {icon}
         </div>
       </div>
     </div>
-  );
-}
-
-// =======================================================
-// OVERVIEW ITEM
-// =======================================================
-
-function OverviewItem({ label, value }) {
-  return (
-    <div className="rounded-xl bg-slate-50 p-4">
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">
-        {label}
-      </p>
-
-      <p className="mt-2 text-xl font-black text-slate-800">{value}</p>
-    </div>
-  );
-}
-
-// =======================================================
-// FILTER BADGE
-// =======================================================
-
-function FilterBadge({ label, value }) {
-  return (
-    <span className="rounded-lg border border-blue-100 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-600">
-      {label}: {value}
-    </span>
   );
 }
