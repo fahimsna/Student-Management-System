@@ -31,6 +31,7 @@ export default function AttendanceReport() {
 
       if (!token) {
         setError("Authentication token not found. Please login again.");
+        setLoading(false);
         return;
       }
 
@@ -74,6 +75,10 @@ export default function AttendanceReport() {
     }
   };
 
+  /* =========================================================
+     INITIAL LOAD
+  ========================================================= */
+
   useEffect(() => {
     fetchAttendance();
   }, []);
@@ -99,7 +104,7 @@ export default function AttendanceReport() {
   };
 
   /* =========================================================
-     FLATTEN ATTENDANCE
+     STUDENT ATTENDANCE
   ========================================================= */
 
   const studentAttendance = useMemo(() => {
@@ -147,7 +152,7 @@ export default function AttendanceReport() {
   }, [attendance]);
 
   /* =========================================================
-     OVERALL STATISTICS
+     STATISTICS
   ========================================================= */
 
   const totalStudents = studentAttendance.length;
@@ -203,9 +208,11 @@ export default function AttendanceReport() {
           NAVBAR
       ====================================================== */}
 
-      <div className="relative z-[100]">
-        <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-      </div>
+      <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
+
+      {/* =====================================================
+          BELOW NAVBAR
+      ====================================================== */}
 
       <div className="flex min-h-0 flex-1">
         {/* ===================================================
@@ -214,14 +221,16 @@ export default function AttendanceReport() {
 
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
-        <div className="flex min-w-0 flex-1 flex-col">
-          {/* =================================================
-              MAIN
-          ================================================== */}
+        {/* ===================================================
+            MAIN CONTENT AREA
+        ==================================================== */}
 
+        <div className="flex min-w-0 flex-1 flex-col">
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
             <div className="mx-auto w-full max-w-7xl">
-              {/* Header */}
+              {/* =================================================
+                  PAGE HEADER
+              ================================================== */}
 
               <div className="mb-7">
                 <div className="mb-2 flex items-center gap-2">
@@ -248,7 +257,7 @@ export default function AttendanceReport() {
                     type="button"
                     onClick={() => fetchAttendance(filters)}
                     disabled={loading}
-                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-50"
+                    className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 text-sm font-bold text-slate-700 shadow-sm transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <span className={loading ? "animate-spin" : ""}>↻</span>
                     Refresh
@@ -257,7 +266,7 @@ export default function AttendanceReport() {
               </div>
 
               {/* =================================================
-                  SUMMARY
+                  SUMMARY CARDS
               ================================================== */}
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -298,7 +307,7 @@ export default function AttendanceReport() {
               </div>
 
               {/* =================================================
-                  FILTERS
+                  FILTER CARD
               ================================================== */}
 
               <section className="mt-6 overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[0_4px_24px_rgba(15,23,42,0.035)]">
@@ -332,7 +341,7 @@ export default function AttendanceReport() {
                           date: e.target.value,
                         })
                       }
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     />
                   </div>
 
@@ -351,7 +360,7 @@ export default function AttendanceReport() {
                           department: e.target.value,
                         })
                       }
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     >
                       <option value="">All Departments</option>
 
@@ -378,7 +387,7 @@ export default function AttendanceReport() {
                           semester: e.target.value,
                         })
                       }
-                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm outline-none transition focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      className="h-11 w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 text-sm text-slate-700 outline-none transition hover:border-slate-300 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
                     >
                       <option value="">All Semesters</option>
 
@@ -396,7 +405,7 @@ export default function AttendanceReport() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="h-11 flex-1 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-blue-600 disabled:opacity-50"
+                      className="h-11 flex-1 rounded-xl bg-slate-900 px-4 text-sm font-bold text-white transition hover:bg-blue-600 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {loading ? "Loading..." : "Generate Report"}
                     </button>
@@ -428,7 +437,7 @@ export default function AttendanceReport() {
 
               {!loading && studentAttendance.length > 0 && (
                 <section className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
-                  {/* Attendance Rate */}
+                  {/* Overall */}
 
                   <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-[0_4px_24px_rgba(15,23,42,0.035)]">
                     <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
@@ -453,7 +462,7 @@ export default function AttendanceReport() {
 
                     <div className="mt-6 h-2.5 overflow-hidden rounded-full bg-slate-100">
                       <div
-                        className="h-full rounded-full bg-blue-600"
+                        className="h-full rounded-full bg-blue-600 transition-all"
                         style={{
                           width: `${overallPercentage}%`,
                         }}
@@ -621,8 +630,6 @@ export default function AttendanceReport() {
                               key={student.id}
                               className="transition hover:bg-slate-50/70"
                             >
-                              {/* Student */}
-
                               <td className="px-5 py-4">
                                 <div className="flex items-center gap-3">
                                   <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-[10px] font-black text-blue-600">
@@ -641,8 +648,6 @@ export default function AttendanceReport() {
                                 </div>
                               </td>
 
-                              {/* Department */}
-
                               <td className="px-5 py-4">
                                 <div>
                                   <p className="text-xs font-semibold text-slate-600">
@@ -655,15 +660,11 @@ export default function AttendanceReport() {
                                 </div>
                               </td>
 
-                              {/* Total */}
-
                               <td className="px-5 py-4 text-center">
                                 <span className="text-xs font-bold text-slate-700">
                                   {student.total}
                                 </span>
                               </td>
-
-                              {/* Present */}
 
                               <td className="px-5 py-4 text-center">
                                 <span className="text-xs font-bold text-emerald-600">
@@ -671,23 +672,17 @@ export default function AttendanceReport() {
                                 </span>
                               </td>
 
-                              {/* Absent */}
-
                               <td className="px-5 py-4 text-center">
                                 <span className="text-xs font-bold text-red-600">
                                   {student.absent}
                                 </span>
                               </td>
 
-                              {/* Late */}
-
                               <td className="px-5 py-4 text-center">
                                 <span className="text-xs font-bold text-amber-600">
                                   {student.late}
                                 </span>
                               </td>
-
-                              {/* Percentage */}
 
                               <td className="px-5 py-4">
                                 <div className="flex items-center justify-end gap-3">
@@ -778,11 +773,11 @@ export default function AttendanceReport() {
                           <div>
                             <div className="flex flex-wrap items-center gap-2">
                               <span className="text-sm font-bold text-slate-800">
-                                {session.department}
+                                {session.department || "Department"}
                               </span>
 
                               <span className="rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-bold text-blue-700">
-                                Semester {session.semester}
+                                Semester {session.semester || "—"}
                               </span>
                             </div>
 
