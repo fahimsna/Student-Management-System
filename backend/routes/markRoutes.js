@@ -10,13 +10,25 @@ const authMiddleware = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// Add marks
+// =====================================================
+// ADD MARKS
+// POST /api/marks/addMarks
+// =====================================================
+
 router.post("/addMarks", authMiddleware, createMarks);
 
-// Get all marks
+// =====================================================
+// GET ALL MARKS
+// GET /api/marks/getMarks
+// =====================================================
+
 router.get("/getMarks", authMiddleware, getMarks);
 
-// Get marks for one student
+// =====================================================
+// GET MARKS FOR ONE STUDENT
+// GET /api/marks/student/:studentId
+// =====================================================
+
 router.get("/student/:studentId", authMiddleware, getStudentMarks);
 
 module.exports = router;

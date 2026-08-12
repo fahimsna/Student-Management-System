@@ -5,20 +5,14 @@ import Sidebar from "../../components/Sidebar";
 import Footer from "../../components/Footer";
 
 import { getStudent } from "../../api/studentApi";
+import { createMarks } from "../../api/markApi";
 
 export default function AddMarks() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // =====================================================
-  // STUDENTS
-  // =====================================================
-
   const [students, setStudents] = useState([]);
   const [loadingStudents, setLoadingStudents] = useState(true);
-
-  // =====================================================
-  // FORM
-  // =====================================================
+  const [saving, setSaving] = useState(false);
 
   const [selectedStudent, setSelectedStudent] = useState("");
 
@@ -55,7 +49,10 @@ export default function AddMarks() {
       } catch (err) {
         console.error("Failed to load students:", err);
 
-        setError(err?.response?.data?.message || "Failed to load students.");
+        setError(
+          err?.response?.data?.message ||
+            "Failed to load students. Please try again.",
+        );
       } finally {
         setLoadingStudents(false);
       }
@@ -81,7 +78,7 @@ export default function AddMarks() {
   };
 
   // =====================================================
-  // RESULT TYPE CHANGE
+  // RESULT TYPE
   // =====================================================
 
   const handleResultTypeChange = (e) => {
@@ -153,34 +150,30 @@ export default function AddMarks() {
   // SUBMIT
   // =====================================================
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
     setSuccess("");
 
-    // Student
+    // ---------------------------------------------------
+    // VALIDATION
+    // ---------------------------------------------------
 
     if (!selectedStudent) {
       setError("Please select a student.");
       return;
     }
 
-    // Course
-
     if (!formData.course.trim()) {
       setError("Please enter the course.");
       return;
     }
 
-    // Result Type
-
     if (!formData.resultType.trim()) {
       setError("Please enter or select the result type.");
       return;
     }
-
-    // Total Marks
 
     if (!formData.totalMarks) {
       setError("Please enter total marks.");
@@ -191,8 +184,6 @@ export default function AddMarks() {
       setError("Total marks must be greater than 0.");
       return;
     }
-
-    // Obtained Marks
 
     if (formData.obtainedMarks === "") {
       setError("Please enter obtained marks.");
@@ -209,25 +200,25 @@ export default function AddMarks() {
       return;
     }
 
-    // Date
-
     if (!formData.date) {
       setError("Please select the assessment date.");
       return;
     }
 
-    // ===================================================
-    // DATA THAT WILL BE SENT TO BACKEND
-    // ===================================================
+    if (!student) {
+      setError("Selected student could not be found.");
+      return;
+    }
+
+    // ---------------------------------------------------
+    // DATA
+    // ---------------------------------------------------
 
     const marksData = {
       studentId: selectedStudent,
-
-      studentName: student?.name,
-
-      department: student?.department,
-
-      semester: student?.semester,
+      studentName: student.name,
+      department: student.department,
+      semester: student.semester,
 
       course: formData.course.trim(),
 
@@ -244,23 +235,49 @@ export default function AddMarks() {
       date: formData.date,
     };
 
-    console.log("Marks data ready:", marksData);
+    console.log("Sending marks to backend:", marksData);
 
-    /*
-      Backend API will be connected here.
+    // ---------------------------------------------------
+    // SAVE
+    // ---------------------------------------------------
 
-      Example:
+    try {
+      setSaving(true);
 
-      await createMarks(marksData);
-    */
+      const response = await createMarks(marksData);
 
-    setSuccess(
-      "Marks prepared successfully. Backend saving will be connected next.",
-    );
+      console.log("Marks API response:", response.data);
+
+      setSuccess("Marks saved successfully.");
+
+      // Clear the form after successful save
+      setSelectedStudent("");
+
+      setCustomResultType(false);
+
+      setFormData({
+        course: "",
+        resultType: "",
+        totalMarks: "",
+        obtainedMarks: "",
+        date: new Date().toISOString().split("T")[0],
+      });
+    } catch (err) {
+      console.error("Failed to save marks:", err);
+
+      console.error("Backend error:", err?.response?.data);
+
+      setError(
+        err?.response?.data?.message ||
+          "Failed to save marks. Please try again.",
+      );
+    } finally {
+      setSaving(false);
+    }
   };
 
   // =====================================================
-  // RESET FORM
+  // RESET
   // =====================================================
 
   const handleReset = () => {
@@ -286,29 +303,15 @@ export default function AddMarks() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* =================================================
-          NAVBAR
-      ================================================== */}
-
       <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
       <div className="flex">
-        {/* =================================================
-            SIDEBAR
-        ================================================== */}
-
         <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-
-        {/* =================================================
-            MAIN AREA
-        ================================================== */}
 
         <div className="flex min-h-[calc(100vh-4rem)] min-w-0 flex-1 flex-col">
           <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
             <div className="mx-auto w-full max-w-5xl">
-              {/* =================================================
-                  PAGE HEADER
-              ================================================== */}
+              {/* HEADER */}
 
               <div className="mb-7">
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-blue-600">
@@ -325,17 +328,13 @@ export default function AddMarks() {
                 </p>
               </div>
 
-              {/* =================================================
-                  FORM
-              ================================================== */}
+              {/* FORM */}
 
               <form
                 onSubmit={handleSubmit}
                 className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
               >
-                {/* =================================================
-                    FORM HEADER
-                ================================================== */}
+                {/* FORM HEADER */}
 
                 <div className="border-b border-slate-100 px-6 py-5">
                   <div className="flex items-center gap-3">
@@ -356,9 +355,7 @@ export default function AddMarks() {
                 </div>
 
                 <div className="space-y-6 p-6">
-                  {/* =================================================
-                      ERROR
-                  ================================================== */}
+                  {/* ERROR */}
 
                   {error && (
                     <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
@@ -370,9 +367,7 @@ export default function AddMarks() {
                     </div>
                   )}
 
-                  {/* =================================================
-                      SUCCESS
-                  ================================================== */}
+                  {/* SUCCESS */}
 
                   {success && (
                     <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
@@ -384,9 +379,7 @@ export default function AddMarks() {
                     </div>
                   )}
 
-                  {/* =================================================
-                      STUDENT
-                  ================================================== */}
+                  {/* STUDENT */}
 
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -400,7 +393,7 @@ export default function AddMarks() {
                         setError("");
                         setSuccess("");
                       }}
-                      disabled={loadingStudents}
+                      disabled={loadingStudents || saving}
                       className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <option value="">
@@ -425,15 +418,11 @@ export default function AddMarks() {
                     )}
                   </div>
 
-                  {/* =================================================
-                      SELECTED STUDENT
-                  ================================================== */}
+                  {/* SELECTED STUDENT */}
 
                   {student && (
                     <div className="rounded-2xl border border-blue-100 bg-blue-50/50 p-4">
                       <div className="flex items-center gap-4">
-                        {/* Avatar */}
-
                         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-100 text-sm font-bold text-blue-600">
                           {student.name
                             ?.split(" ")
@@ -442,8 +431,6 @@ export default function AddMarks() {
                             .slice(0, 2)
                             .toUpperCase()}
                         </div>
-
-                        {/* Information */}
 
                         <div className="min-w-0">
                           <p className="font-bold text-slate-800">
@@ -460,7 +447,7 @@ export default function AddMarks() {
                             </span>
 
                             <span className="rounded-lg bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-500">
-                              Semester / Class {student.semester}
+                              Class {student.semester}
                             </span>
                           </div>
                         </div>
@@ -468,14 +455,10 @@ export default function AddMarks() {
                     </div>
                   )}
 
-                  {/* =================================================
-                      COURSE + RESULT TYPE
-                  ================================================== */}
+                  {/* COURSE + RESULT TYPE */}
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                    {/* =================================================
-                        COURSE
-                    ================================================== */}
+                    {/* COURSE */}
 
                     <div>
                       <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -487,18 +470,13 @@ export default function AddMarks() {
                         name="course"
                         value={formData.course}
                         onChange={handleChange}
-                        placeholder="e.g. CSE340"
-                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                        disabled={saving}
+                        placeholder="e.g. Bangla"
+                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                       />
-
-                      <p className="mt-2 text-[11px] text-slate-400">
-                        Enter the course code or course name.
-                      </p>
                     </div>
 
-                    {/* =================================================
-                        RESULT TYPE
-                    ================================================== */}
+                    {/* RESULT TYPE */}
 
                     <div>
                       <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -510,7 +488,8 @@ export default function AddMarks() {
                           customResultType ? "Custom" : formData.resultType
                         }
                         onChange={handleResultTypeChange}
-                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                        disabled={saving}
+                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                       >
                         <option value="">Select result type</option>
 
@@ -539,10 +518,6 @@ export default function AddMarks() {
                         </option>
                       </select>
 
-                      {/* =================================================
-                          CUSTOM RESULT TYPE
-                      ================================================== */}
-
                       {customResultType && (
                         <div className="mt-3">
                           <input
@@ -557,9 +532,10 @@ export default function AddMarks() {
                               setError("");
                               setSuccess("");
                             }}
+                            disabled={saving}
                             placeholder="e.g. Weekly Test, Chapter 3 Assessment..."
                             autoFocus
-                            className="h-12 w-full rounded-xl border border-blue-200 bg-blue-50/50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                            className="h-12 w-full rounded-xl border border-blue-200 bg-blue-50/50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                           />
 
                           <p className="mt-2 text-[11px] text-blue-500">
@@ -570,13 +546,9 @@ export default function AddMarks() {
                     </div>
                   </div>
 
-                  {/* =================================================
-                      MARKS
-                  ================================================== */}
+                  {/* MARKS */}
 
                   <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                    {/* Total Marks */}
-
                     <div>
                       <label className="mb-2 block text-sm font-semibold text-slate-700">
                         Total Marks
@@ -587,13 +559,12 @@ export default function AddMarks() {
                         name="totalMarks"
                         value={formData.totalMarks}
                         onChange={handleChange}
+                        disabled={saving}
                         min="1"
                         placeholder="e.g. 30"
-                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                       />
                     </div>
-
-                    {/* Obtained Marks */}
 
                     <div>
                       <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -605,17 +576,16 @@ export default function AddMarks() {
                         name="obtainedMarks"
                         value={formData.obtainedMarks}
                         onChange={handleChange}
+                        disabled={saving}
                         min="0"
                         max={formData.totalMarks || undefined}
                         placeholder="e.g. 26"
-                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                        className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                       />
                     </div>
                   </div>
 
-                  {/* =================================================
-                      DATE
-                  ================================================== */}
+                  {/* DATE */}
 
                   <div>
                     <label className="mb-2 block text-sm font-semibold text-slate-700">
@@ -627,13 +597,12 @@ export default function AddMarks() {
                       name="date"
                       value={formData.date}
                       onChange={handleChange}
-                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10"
+                      disabled={saving}
+                      className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 text-sm text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60"
                     />
                   </div>
 
-                  {/* =================================================
-                      RESULT PREVIEW
-                  ================================================== */}
+                  {/* RESULT PREVIEW */}
 
                   {percentage !== null && (
                     <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
@@ -648,8 +617,6 @@ export default function AddMarks() {
                       </div>
 
                       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                        {/* Obtained */}
-
                         <div className="rounded-xl bg-white p-4">
                           <p className="text-[11px] font-medium text-slate-400">
                             Marks
@@ -657,14 +624,13 @@ export default function AddMarks() {
 
                           <p className="mt-1 text-lg font-black text-slate-800">
                             {formData.obtainedMarks}
+
                             <span className="text-xs font-medium text-slate-400">
                               {" "}
                               / {formData.totalMarks}
                             </span>
                           </p>
                         </div>
-
-                        {/* Percentage */}
 
                         <div className="rounded-xl bg-white p-4">
                           <p className="text-[11px] font-medium text-slate-400">
@@ -675,8 +641,6 @@ export default function AddMarks() {
                             {percentage}%
                           </p>
                         </div>
-
-                        {/* Grade */}
 
                         <div className="rounded-xl bg-white p-4">
                           <p className="text-[11px] font-medium text-slate-400">
@@ -694,8 +658,6 @@ export default function AddMarks() {
                           </p>
                         </div>
 
-                        {/* Result Type */}
-
                         <div className="rounded-xl bg-white p-4">
                           <p className="text-[11px] font-medium text-slate-400">
                             Type
@@ -709,34 +671,30 @@ export default function AddMarks() {
                     </div>
                   )}
 
-                  {/* =================================================
-                      ACTIONS
-                  ================================================== */}
+                  {/* ACTIONS */}
 
                   <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:justify-end">
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="h-11 rounded-xl border border-slate-200 px-5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50"
+                      disabled={saving}
+                      className="h-11 rounded-xl border border-slate-200 px-5 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       Clear
                     </button>
 
                     <button
                       type="submit"
-                      className="h-11 rounded-xl bg-blue-600 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md"
+                      disabled={saving}
+                      className="h-11 rounded-xl bg-blue-600 px-6 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700 hover:shadow-md disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      Save Marks
+                      {saving ? "Saving..." : "Save Marks"}
                     </button>
                   </div>
                 </div>
               </form>
             </div>
           </main>
-
-          {/* =================================================
-              FOOTER
-          ================================================== */}
 
           <Footer />
         </div>

@@ -40,6 +40,7 @@ const marksSchema = new mongoose.Schema(
     grade: {
       type: String,
       required: true,
+      trim: true,
     },
 
     date: {
