@@ -12,6 +12,9 @@ import Profile from "./pages/Profile";
 import TakeAttendance from "./pages/TakeAttendance";
 import AttendanceRecord from "./pages/attendance/AttendanceRecord";
 import AttendanceReport from "./pages/attendance/AttendanceReport";
+import AddMarks from "./pages/marks/AddMarks";
+import MarksRecords from "./pages/marks/MarksRecords";
+import MarksReport from "./pages/marks/MarksReport";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -124,6 +127,9 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/marks/add" element={<AddMarks />} />
+        <Route path="/marks/records" element={<MarksRecords />} />
+        <Route path="/marks/report" element={<MarksReport />} />
 
         {/* =========================
             FALLBACK
