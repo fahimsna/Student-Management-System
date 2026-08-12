@@ -7,7 +7,6 @@ import {
   UserCircle,
   ChevronRight,
   ChevronDown,
-  LogOut,
   ClipboardCheck,
   ClipboardList,
   BarChart3,
@@ -71,9 +70,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
   return (
     <>
-      {/* =====================================================
-          MOBILE OVERLAY
-      ====================================================== */}
+      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
@@ -81,9 +78,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
         />
       )}
 
-      {/* =====================================================
-          SIDEBAR
-      ====================================================== */}
+      {/* Sidebar */}
       <aside
         className={`
           fixed left-0 top-[72px] z-50
@@ -105,9 +100,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           md:shadow-none
         `}
       >
-        {/* =================================================
-            NAVIGATION
-        ================================================== */}
+        {/* Navigation */}
         <div className="flex-1 overflow-y-auto px-4 py-7">
           {/* Main Menu */}
           <div className="mb-4 px-3">
@@ -182,9 +175,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
               );
             })}
 
-            {/* =================================================
-                ATTENDANCE
-            ================================================== */}
+            {/* Attendance */}
             <button
               type="button"
               onClick={() => setAttendanceOpen((previous) => !previous)}
@@ -301,9 +292,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
             )}
           </nav>
 
-          {/* =================================================
-              ACCOUNT
-          ================================================== */}
+          {/* Account */}
           <div className="mb-4 mt-8 px-3">
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">
               Account
@@ -366,25 +355,9 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </nav>
         </div>
 
-        {/* =================================================
-            LOGOUT
-        ================================================== */}
+        {/* Logout */}
         <div className="border-t border-slate-100 p-4">
-          <div className="group flex items-center gap-3 rounded-xl px-3 py-2.5 transition hover:bg-red-50">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500 transition group-hover:bg-white">
-              <LogOut size={17} />
-            </div>
-
-            <div className="flex-1">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-slate-400">
-                Account
-              </p>
-
-              <div className="mt-0.5 text-sm font-semibold text-slate-600 group-hover:text-red-600">
-                <Logout />
-              </div>
-            </div>
-          </div>
+          <Logout />
         </div>
       </aside>
     </>
