@@ -68,7 +68,7 @@ function App() {
         />
 
         <Route
-          path="/add-student"
+          path="/students/add"
           element={
             <ProtectedRoute>
               <AddStudent />
