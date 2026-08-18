@@ -4,6 +4,7 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
+
 import AddStudent from "./pages/AddStudent";
 import Students from "./pages/Students";
 import EditStudent from "./pages/EditStudent";
@@ -60,11 +61,15 @@ function App() {
           }
         />
 
+        {/* Add Student
+            Keep both URLs working so existing links/bookmarks
+            do not break.
+        */}
         <Route
-          path="/students/:id"
+          path="/students/add"
           element={
             <ProtectedRoute>
-              <StudentDetails />
+              <AddStudent />
             </ProtectedRoute>
           }
         />
@@ -74,6 +79,18 @@ function App() {
           element={
             <ProtectedRoute>
               <AddStudent />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* IMPORTANT:
+            Dynamic student route comes AFTER /students/add.
+        */}
+        <Route
+          path="/students/:id"
+          element={
+            <ProtectedRoute>
+              <StudentDetails />
             </ProtectedRoute>
           }
         />
@@ -166,7 +183,7 @@ function App() {
             FALLBACK
         ====================================================== */}
 
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
