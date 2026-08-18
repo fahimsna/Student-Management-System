@@ -9,9 +9,11 @@ import Students from "./pages/Students";
 import EditStudent from "./pages/EditStudent";
 import StudentDetails from "./pages/StudentDetails";
 import Profile from "./pages/Profile";
+
 import TakeAttendance from "./pages/TakeAttendance";
 import AttendanceRecord from "./pages/attendance/AttendanceRecord";
 import AttendanceReport from "./pages/attendance/AttendanceReport";
+
 import AddMarks from "./pages/marks/AddMarks";
 import MarksRecords from "./pages/marks/MarksRecords";
 import MarksReport from "./pages/marks/MarksReport";
@@ -22,9 +24,9 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* =========================
+        {/* =====================================================
             PUBLIC ROUTES
-        ========================= */}
+        ====================================================== */}
 
         <Route path="/" element={<Home />} />
 
@@ -32,9 +34,9 @@ function App() {
 
         <Route path="/register" element={<Register />} />
 
-        {/* =========================
+        {/* =====================================================
             DASHBOARD
-        ========================= */}
+        ====================================================== */}
 
         <Route
           path="/dashboard"
@@ -45,9 +47,9 @@ function App() {
           }
         />
 
-        {/* =========================
+        {/* =====================================================
             STUDENTS
-        ========================= */}
+        ====================================================== */}
 
         <Route
           path="/students"
@@ -68,7 +70,7 @@ function App() {
         />
 
         <Route
-          path="/students/add"
+          path="/add-student"
           element={
             <ProtectedRoute>
               <AddStudent />
@@ -85,9 +87,9 @@ function App() {
           }
         />
 
-        {/* =========================
+        {/* =====================================================
             PROFILE
-        ========================= */}
+        ====================================================== */}
 
         <Route
           path="/profile"
@@ -98,9 +100,9 @@ function App() {
           }
         />
 
-        {/* =========================
+        {/* =====================================================
             ATTENDANCE
-        ========================= */}
+        ====================================================== */}
 
         <Route
           path="/attendance/take"
@@ -119,6 +121,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
           path="/attendance/report"
           element={
@@ -127,15 +130,43 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/marks/add" element={<AddMarks />} />
-        <Route path="/marks/records" element={<MarksRecords />} />
-        <Route path="/marks/report" element={<MarksReport />} />
 
-        {/* =========================
+        {/* =====================================================
+            MARKS
+        ====================================================== */}
+
+        <Route
+          path="/marks/add"
+          element={
+            <ProtectedRoute>
+              <AddMarks />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/marks/records"
+          element={
+            <ProtectedRoute>
+              <MarksRecords />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/marks/report"
+          element={
+            <ProtectedRoute>
+              <MarksReport />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* =====================================================
             FALLBACK
-        ========================= */}
+        ====================================================== */}
 
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
